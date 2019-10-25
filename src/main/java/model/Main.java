@@ -1,4 +1,4 @@
-package Model;
+package main.java.model;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,9 +10,8 @@ public class Main {
         EventQueue.invokeLater( new Runnable() {
             @Override
             public void run(){
-                MenuFrame menuFrame = new MenuFrame();
-                menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                menuFrame.setVisible(true);
+                SettingsFrame settingsFrame = new SettingsFrame();
+
             }
         });
     }
