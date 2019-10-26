@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 public class MyMouseListener implements MouseListener {
     private JLabel label;
@@ -17,9 +16,9 @@ public class MyMouseListener implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (label.getText().equals("Play")){
+        if (label.getText().trim().equals("Play")){
             frame.setVisible(false);
-            BoardFrame boardFrame = new BoardFrame();
+            BoardFrame boardFrame = new BoardFrame(new Settings(new Player(Color.RED,0),new Player(Color.BLUE,0),5000,20));
 
         }
 

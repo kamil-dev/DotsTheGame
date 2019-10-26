@@ -10,7 +10,7 @@ public class SettingsFrame extends JFrame {
     private int height = 525;
 
     public SettingsFrame(){
-        setSize(500,500);
+        setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setVisible(true);
@@ -27,30 +27,27 @@ public class SettingsFrame extends JFrame {
         settingsPanel.setBackground(c1);
         BoxLayout layout = new BoxLayout(settingsPanel,BoxLayout.Y_AXIS);
         settingsPanel.setLayout(layout);
-        settingsPanel.setBorder(new EmptyBorder(new Insets(150, 150, 150, 150)));
+        settingsPanel.setBorder(new EmptyBorder(new Insets(150, 180, 150, 180)));
 
         Font font = new Font("Arial",Font.BOLD,20);
 
 
         JLabel play = new JLabel();
-        play.setText("Play");
+        play.setText("      Play");
         play.setFont(font);
         play.addMouseListener(new MyMouseListener(play,this));
-        play.setHorizontalAlignment(SwingConstants.CENTER);
         play.setForeground(c2);
 
         JLabel loadGame = new JLabel();
         loadGame.setText("Load Game");
         loadGame.setFont(font);
         loadGame.addMouseListener(new MyMouseListener(loadGame,this));
-        loadGame.setHorizontalAlignment(SwingConstants.CENTER);
         loadGame.setForeground(c2);
 
         JLabel settings = new JLabel();
-        settings.setText("Settings");
+        settings.setText("   Settings");
         settings.setFont(font);
         settings.addMouseListener(new MyMouseListener(settings,this));
-        settings.setHorizontalAlignment(SwingConstants.CENTER);
         settings.setForeground(c2);
 
         settingsPanel.add(play);
