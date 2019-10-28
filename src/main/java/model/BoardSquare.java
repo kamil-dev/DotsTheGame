@@ -9,10 +9,10 @@ public class BoardSquare extends JPanel {
     private Settings settings;
     private int state = 0; // 0 - for no dot, 1 - for player's one dot, 2 - for player's two dot;
 
-    public BoardSquare(int row, int column, Settings s) {
+    public BoardSquare(int row, int column) {
         this.row = row;
         this.column = column;
-        this.settings = s;
+        this.settings = Settings.GAME_SETTINGS;
     }
 
     @Override
@@ -44,8 +44,20 @@ public class BoardSquare extends JPanel {
 
     }
 
+    public int getColumn() {
+        return column;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
     public void setState(int state){
         if (this.state != 0) return;
         this.state = state;
+    }
+
+    public int getState() {
+        return state;
     }
 }

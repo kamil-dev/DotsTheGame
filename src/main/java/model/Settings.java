@@ -1,20 +1,28 @@
 package main.java.model;
 
+//singelton
 public class Settings {
+
+    public static Settings GAME_SETTINGS = null;
 
     private Player p1;
     private Player p2;
     private int timer;
     private int boardSize;
+    private Board board;
 
-    public Settings(Player p1, Player p2, int timer, int boardSize) {
+    private Settings(Player p1, Player p2, int timer, int boardSize) {
         this.p1 = p1;
         this.p2 = p2;
         this.timer = timer;
         this.boardSize = boardSize;
+        this.board = new Board(boardSize);
     }
 
-    public Settings() {
+    public static void setGameSettings(Player p1, Player p2, int timer, int boardSize) {
+        if (Settings.GAME_SETTINGS == null){
+            GAME_SETTINGS = new Settings(p1,p2,timer,boardSize);
+        }
     }
 
     public Player getP1() {
@@ -31,5 +39,9 @@ public class Settings {
 
     public int getBoardSize() {
         return boardSize;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }

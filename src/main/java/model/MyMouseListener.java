@@ -18,7 +18,7 @@ public class MyMouseListener implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (label.getText().trim().equals("Play")){
             frame.setVisible(false);
-            BoardFrame boardFrame = new BoardFrame(new Settings(new Player(Color.RED,0),new Player(Color.BLUE,0),5000,20));
+            BoardFrame boardFrame = new BoardFrame();
 
         }
 
