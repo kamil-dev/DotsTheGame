@@ -2,6 +2,7 @@ package main.java.model;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class Main {
 
@@ -11,7 +12,7 @@ public class Main {
             @Override
             public void run(){
                 //Default settings - can be changed.
-                Settings.setGameSettings(new Player(Color.RED,5000),new Player(Color.BLUE,5000),5000,20);
+                Settings.setGameSettings(new Player(Color.RED,5000),new Player(Color.BLUE,5000),5000,25);
                 SettingsFrame settingsFrame = new SettingsFrame();
 
             }
