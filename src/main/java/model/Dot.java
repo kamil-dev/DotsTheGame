@@ -42,4 +42,9 @@ public class Dot {
     public int hashCode() {
         return Objects.hash(x, y, owner);
     }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ") ";
+    }
 }
