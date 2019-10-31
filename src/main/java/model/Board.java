@@ -16,7 +16,26 @@ public class Board {
         matrixOfDots[d.getX()][d.getY()] = d;
         if (isClousurePossible(d) && isEnclosement(d)) {
             List<Dot> listOfLockedDots = Enclousure.LAST_ENCLOUSURE.getInnerDots();
+            for (Dot lockedDot : listOfLockedDots){
+                lockedDot.setAsLocked();
+            }
             List<Dot> listOfChainedDots = Enclousure.LAST_ENCLOUSURE.getOuterDots();
+            BoardSquare[][] boardSquares = Settings.GAME_SETTINGS.getBoardSquares();
+            int x;
+            int y;
+            for (int i = 1; i < listOfChainedDots.size()-1; i++){
+                x = listOfChainedDots.get(i).getX();
+                y = listOfChainedDots.get(i).getY();
+                boardSquares[x][y].setConnections(Arrays.asList(listOfChainedDots.get(i-1),listOfChainedDots.get(i+1)));
+            }
+            boardSquares[listOfChainedDots.get(0).getX()][listOfChainedDots.get(0).getY()].setConnections(Arrays.asList(
+                    listOfChainedDots.get(1),listOfChainedDots.get(listOfChainedDots.size()-1))
+            );
+            boardSquares[listOfChainedDots.get(listOfChainedDots.size()-1).getX()][listOfChainedDots.get(listOfChainedDots.size()-1).getY()].setConnections(Arrays.asList(
+                    listOfChainedDots.get(0),listOfChainedDots.get(listOfChainedDots.size()-2))
+            );
+
+            System.out.println("Enclosed!");
         }
     }
 
@@ -41,7 +60,7 @@ public class Board {
         for (int i = (x == 0) ? 0 : x - 1; i <= ((x == matrixOfDots.length - 1) ? x : x + 1 ) ; i++) {
             for (int j = (y == 0) ? 0 : y - 1; j <= ((y == matrixOfDots.length - 1) ? y : y + 1 ) ; j++) {
                 if (i == x && j == y) ;
-                else if (matrixOfDots[i][j] != null && matrixOfDots[i][j].getOwner().equals(d.getOwner())){
+                else if (matrixOfDots[i][j] != null && matrixOfDots[i][j].getOwner().equals(d.getOwner()) && !matrixOfDots[i][j].isLocked()){
                         adjacentDots.add(matrixOfDots[i][j]);
                 }
             }
@@ -58,7 +77,7 @@ public class Board {
     }
 
     public void findClousure(Stack<Dot> listOfChainedDots) {
-//        System.out.println(listOfChainedDots);
+        System.out.println(listOfChainedDots);
         if (listOfChainedDots.isEmpty()) return;
         if (listOfChainedDots.size() > 3 && areAdjacent(listOfChainedDots.get(0), listOfChainedDots.peek())) {
             List<Dot> opponentsLockedDots = listOfOpponentsLockedDots(listOfChainedDots);
@@ -103,14 +122,14 @@ public class Board {
         for (int i = minX+1; i < maxX; i++) {
             for (int j = minY+1; j < maxY ; j++) {
                 if (!matrixOfDots[i][j].getOwner().equals(chainOfDots.get(0).getOwner()))
-                    if (isLocked(chainOfDots, matrixOfDots[i][j])) lockedDots.add(matrixOfDots[i][j]);
+                    if (isSourrounded(chainOfDots, matrixOfDots[i][j])) lockedDots.add(matrixOfDots[i][j]);
             }
         }
 
         return lockedDots;
     }
 
-    public static boolean isLocked(List<Dot> chainOfDots, Dot d){
+    public static boolean isSourrounded(List<Dot> chainOfDots, Dot d){
         boolean isNorthBorderDot = false;
         boolean isSouthBorderDot = false;
         boolean isWestBorderDot = false;

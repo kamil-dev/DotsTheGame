@@ -16,6 +16,10 @@ public class Dot {
         isLocked = false;
     }
 
+    public boolean isLocked(){
+        return isLocked;
+    }
+
     public int getX() {
         return x;
     }
@@ -27,6 +31,11 @@ public class Dot {
     public Player getOwner() {
         return owner;
     }
+
+    public void setAsLocked() {
+        isLocked = true;
+    }
+
 
     @Override
     public boolean equals(Object o) {

@@ -19,7 +19,6 @@ public class BoardFrame extends JFrame {
         setVisible(true);
         setResizable(false);
         createBoard();
-
     }
 
     private void createBoard(){
@@ -51,9 +50,9 @@ public class BoardFrame extends JFrame {
                 });
             }
         }
+        settings.setBoardSquares(board);
         add(boardPanel,BorderLayout.CENTER);
         repaint();
-
     }
 
 }
