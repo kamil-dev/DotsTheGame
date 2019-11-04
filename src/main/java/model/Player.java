@@ -4,11 +4,13 @@ import java.awt.*;
 import java.util.Objects;
 
 public class Player {
+    int id;
     private Color color;
     private int remainingTime;
     private int points;
 
-    public Player(Color color, int remainingTime) {
+    public Player(int id, Color color, int remainingTime) {
+        this.id = id;
         this.color = color;
         this.remainingTime = remainingTime;
         this.points = 0;

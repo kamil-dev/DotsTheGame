@@ -1,5 +1,7 @@
 package main.java.model;
 
+import main.java.model.dataStructures.Dot;
+
 import java.util.List;
 
 public class Enclousure {

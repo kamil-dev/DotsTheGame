@@ -1,5 +1,7 @@
 package main.java.model;
 
+import main.java.model.dataStructures.Dot;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
