@@ -1,6 +1,9 @@
 package main.java.model;
 
+import main.java.model.dataStructures.Base;
+import main.java.model.dataStructures.Cycle;
 import main.java.model.dataStructures.Dot;
+import main.java.model.dataStructures.DotNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,14 +41,18 @@ public class BoardFrame extends JFrame {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
                         if (isPlayersOneTurn) {
-                            if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP1()));
-                            bs.setState(1);
-                            isPlayersOneTurn = false;
+                            if (bs.getState() == 0) {
+                                settings.getBoard().addDot(new Dot(bs.getRow(), bs.getColumn(), settings.getP1().id));
+                                bs.setState(1);
+                                isPlayersOneTurn = false;
+                            }
                         }
                         else {
-                            if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP2()));
-                            bs.setState(2);
-                            isPlayersOneTurn = true;
+                            if (bs.getState() == 0) {
+                                settings.getBoard().addDot(new Dot(bs.getRow(), bs.getColumn(), settings.getP1().id));
+                                bs.setState(2);
+                                isPlayersOneTurn = true;
+                            }
                         }
                         repaint();
                     }
@@ -56,5 +63,20 @@ public class BoardFrame extends JFrame {
         add(boardPanel,BorderLayout.CENTER);
         repaint();
     }
+
+    private void drawBase(Base base){
+        Cycle cycleToDraw = base.getCycle();
+        DotNode dotNode = cycleToDraw.getDotNode();
+        Dot dot = dotNode.d;
+
+        while (dotNode != null){
+
+
+            dotNode = dotNode.next;
+        }
+
+
+    }
+
 
 }

@@ -95,4 +95,9 @@ public class Cycle implements ICycle {
     public int getYmax() {
         return ymax;
     }
+
+    public DotNode getDotNode() {
+        return dotNode;
+
+    }
 }

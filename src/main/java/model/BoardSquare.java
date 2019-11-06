@@ -44,9 +44,9 @@ public class BoardSquare extends JPanel {
 
 
         Color c = null;
-        if (state == 1) c = settings.getP1().getColor();
-        if (state == 2) c = settings.getP2().getColor();
         if (state != 0) {
+            if (state == 1) c = settings.getP1().getColor(); else c = settings.getP2().getColor();
+
             g.setColor(c);
             g.fillOval(width/2-4,height/2-4,8,8);
 

@@ -5,8 +5,8 @@ package main.java.model.dataStructures;
 import java.util.Stack;
 
 public class DotNode {
-    Dot d;
-    DotNode next;
+    public Dot d;
+    public DotNode next;
 
     public DotNode(Dot d, DotNode next){
         this.d = d;
@@ -33,4 +33,5 @@ public class DotNode {
         }
         return false;
     }
+
 }
