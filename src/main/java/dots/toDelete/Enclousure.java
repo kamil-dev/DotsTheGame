@@ -1,4 +1,6 @@
-package main.java.model;
+package main.java.dots.toDelete;
+
+import main.java.dots.model.dataStructures.Dot;
 
 import java.util.List;
 

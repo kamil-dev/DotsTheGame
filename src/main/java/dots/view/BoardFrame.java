@@ -1,4 +1,6 @@
-package main.java.model;
+package main.java.dots.view;
+
+import main.java.dots.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,12 +38,12 @@ public class BoardFrame extends JFrame {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
                         if (isPlayersOneTurn) {
-                            if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP1()));
+                            //if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP1()));
                             bs.setState(1);
                             isPlayersOneTurn = false;
                         }
                         else {
-                            if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP2()));
+                            //if (bs.getState() == 0) settings.getBoard().addDot(new Dot(bs.getRow(),bs.getColumn(),settings.getP2()));
                             bs.setState(2);
                             isPlayersOneTurn = true;
                         }

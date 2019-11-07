@@ -1,4 +1,6 @@
-package main.java.model;
+package main.java.dots.controller;
+
+import main.java.dots.view.BoardFrame;
 
 import javax.swing.*;
 import java.awt.*;
