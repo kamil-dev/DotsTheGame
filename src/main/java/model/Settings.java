@@ -21,9 +21,7 @@ public class Settings {
     }
 
     public static void setGameSettings(Player p1, Player p2, int timer, int boardSize) {
-        if (Settings.GAME_SETTINGS == null){
             GAME_SETTINGS = new Settings(p1,p2,timer,boardSize);
-        }
     }
 
     public void setBoardSquares(BoardSquare[][] boardSquares){

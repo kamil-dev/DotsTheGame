@@ -23,6 +23,9 @@ public class BoardSquare extends JPanel {
     public void setConnections(List<Dot> connections){
         this.connections.addAll(connections);
     }
+    public void addConnection(Dot connectedDot){
+        this.connections.add(connectedDot);
+    }
 
     @Override
     protected void paintComponent(Graphics g) {

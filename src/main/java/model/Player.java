@@ -5,16 +5,24 @@ import java.util.Objects;
 
 public class Player {
     int id;
+    private String name;
     private Color color;
     private int remainingTime;
     private int points;
 
     public Player(int id, Color color, int remainingTime) {
+        this(id,color,remainingTime, String.valueOf(id));
+    }
+
+    public Player(int id, Color color, int remainingTime, String name) {
         this.id = id;
         this.color = color;
         this.remainingTime = remainingTime;
         this.points = 0;
+        this.name = name;
     }
+
+    public int getId() {return this.id;}
 
     public Color getColor() {
         return color;
@@ -28,7 +36,9 @@ public class Player {
         return points;
     }
 
-
+    public String getName(){
+        return name;
+    }
 
     public void setPoints(int points) {
         this.points = points;
@@ -47,4 +57,6 @@ public class Player {
     public int hashCode() {
         return Objects.hash(color, remainingTime);
     }
+
+
 }

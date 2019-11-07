@@ -1,5 +1,10 @@
 package main.java.model;
 
+import main.view.BoardFrame;
+import main.view.LoadGameFrame;
+import main.view.MenuFrame;
+import main.view.SettingsFrame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -19,7 +24,15 @@ public class MyMouseListener implements MouseListener {
         if (label.getText().trim().equals("Play")){
             frame.setVisible(false);
             BoardFrame boardFrame = new BoardFrame();
-
+        } else if (label.getText().trim().equals("Settings")){
+            frame.setVisible(false);
+            SettingsFrame settingsFrame = new SettingsFrame();
+        } else if (label.getText().trim().equals("Load Game")){
+            frame.setVisible(false);
+            LoadGameFrame settingsFrame = new LoadGameFrame();
+        } else if (label.getText().trim().equals("Cancel")){
+            frame.setVisible(false);
+            MenuFrame menuFrame = new MenuFrame();
         }
 
     }
