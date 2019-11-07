@@ -1,6 +1,6 @@
 /*created on 2019-11-05
  Author: Marcin Bartosiak */
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
 public class Edge {
     private Dot d1;

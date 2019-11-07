@@ -1,6 +1,6 @@
 /*created on 2019-11-03
  Author: Marcin Bartosiak */
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
 public class DotNode {
     public Dot d;
@@ -31,4 +31,5 @@ public class DotNode {
         }
         return false;
     }
+
 }

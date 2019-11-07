@@ -1,6 +1,9 @@
-package main.java.dots.controller;
+package main.java.controller;
 
-import main.java.dots.view.BoardFrame;
+import main.java.view.BoardFrame;
+import main.java.view.LoadGameFrame;
+import main.java.view.MenuFrame;
+import main.java.view.SettingsFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +24,15 @@ public class MyMouseListener implements MouseListener {
         if (label.getText().trim().equals("Play")){
             frame.setVisible(false);
             BoardFrame boardFrame = new BoardFrame();
-
+        } else if (label.getText().trim().equals("Settings")){
+            frame.setVisible(false);
+            SettingsFrame settingsFrame = new SettingsFrame();
+        } else if (label.getText().trim().equals("Load Game")){
+            frame.setVisible(false);
+            LoadGameFrame settingsFrame = new LoadGameFrame();
+        } else if (label.getText().trim().equals("Cancel")){
+            frame.setVisible(false);
+            MenuFrame menuFrame = new MenuFrame();
         }
 
     }

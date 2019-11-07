@@ -1,7 +1,7 @@
-package main.java.dots.view;
+package main.java.view;
 
-import main.java.dots.Settings;
-import main.java.dots.model.dataStructures.Dot;
+import main.java.model.Settings;
+import main.java.model.dataStructures.Dot;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +24,9 @@ public class BoardSquare extends JPanel {
     public void setConnections(List<Dot> connections){
         this.connections.addAll(connections);
     }
+    public void addConnection(Dot connectedDot){
+        this.connections.add(connectedDot);
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -45,9 +48,9 @@ public class BoardSquare extends JPanel {
 
 
         Color c = null;
-        if (state == 1) c = settings.getP1().getColor();
-        if (state == 2) c = settings.getP2().getColor();
         if (state != 0) {
+            if (state == 1) c = settings.getP1().getColor(); else c = settings.getP2().getColor();
+
             g.setColor(c);
             g.fillOval(width/2-4,height/2-4,8,8);
 

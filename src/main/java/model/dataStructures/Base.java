@@ -1,8 +1,8 @@
 /*created on 2019-11-03
  Author: Marcin Bartosiak */
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
-import main.java.dots.model.Board;
+import main.java.model.Board;
 
 /*
     ==========================

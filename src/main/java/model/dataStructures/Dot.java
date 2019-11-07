@@ -1,4 +1,4 @@
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
 public class Dot {
     private int x;

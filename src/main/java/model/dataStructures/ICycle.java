@@ -1,4 +1,4 @@
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
 public interface ICycle {
     public boolean contains(Dot d);

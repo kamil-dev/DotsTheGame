@@ -1,6 +1,6 @@
-package main.java.dots.model;
+package main.java.model;
 
-import main.java.dots.model.dataStructures.*;
+import main.java.model.dataStructures.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

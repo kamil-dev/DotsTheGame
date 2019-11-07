@@ -1,8 +1,8 @@
 /*created on 2019-11-03
  Author: Marcin Bartosiak */
-package main.java.dots.model.dataStructures;
+package main.java.model.dataStructures;
 
-import main.java.dots.model.Board;
+import main.java.model.Board;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     ==========================
  */
 
-public class Cycle implements ICycle {
+public class Cycle implements main.java.model.dataStructures.ICycle {
     private Board board;
     private int ownerId;
     private int xmin = Integer.MAX_VALUE;
