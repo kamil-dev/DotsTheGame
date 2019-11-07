@@ -1,11 +1,6 @@
-package main.java.model;
+package main.java.dots;
 
-import main.java.model.dataStructures.Dot;
-import main.java.model.dataStructures.DotNode;
-
-import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class Main {
 

@@ -1,8 +1,8 @@
 /*created on 2019-11-03
  Author: Marcin Bartosiak */
-package main.java.model.dataStructures;
+package main.java.dots.model.dataStructures;
 
-import main.java.model.Board;
+import main.java.dots.model.Board;
 
 /*
     ==========================
@@ -32,7 +32,12 @@ public class Base implements ICycle{
     public boolean hasInside(Dot d) {
         return cycle.hasInside(d);
     }
-    
+
+    @Override
+    public boolean hasOutside(Dot d) {
+        return cycle.hasOutside(d);
+    }
+
     private int countPoints(){
         int pointsCount = 0;
         for(int i = this.cycle.getXmin(); i<=this.cycle.getXmax(); i++)

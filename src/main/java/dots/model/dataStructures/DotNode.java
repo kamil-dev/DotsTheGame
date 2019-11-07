@@ -1,12 +1,10 @@
 /*created on 2019-11-03
  Author: Marcin Bartosiak */
-package main.java.model.dataStructures;
-
-import java.util.Stack;
+package main.java.dots.model.dataStructures;
 
 public class DotNode {
-    Dot d;
-    DotNode next;
+    public Dot d;
+    public DotNode next;
 
     public DotNode(Dot d, DotNode next){
         this.d = d;

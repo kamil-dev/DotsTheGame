@@ -1,5 +1,7 @@
-package main.java.model;
+package main.java.dots;
 
+
+import main.java.dots.controller.MyMouseListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

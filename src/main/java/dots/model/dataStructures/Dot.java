@@ -1,13 +1,13 @@
-package main.java.model.dataStructures;
+package main.java.dots.model.dataStructures;
 
 public class Dot {
-        private int x;
-        private int y;
-        private int hashCode;
-        private int ownerId;
-        private boolean isInsideBase;
+    private int x;
+    private int y;
+    private int hashCode;
+    private int ownerId;
+    private boolean isInsideBase;
 
-
+        // max size of a board ensuring unique hashcodes set to 1000
     public Dot(int x, int y, int ownerId) {
         this.x = x;
         this.y = y;
@@ -16,9 +16,6 @@ public class Dot {
         isInsideBase = false;
     }
 
-    public boolean isInsideBase(){
-        return isInsideBase;
-    }
 
     public int getX() {
         return x;
@@ -39,11 +36,17 @@ public class Dot {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null)
+        if (o == null || o.getClass() != this.getClass())
             return false;
         return this.hashCode() == o.hashCode();
     }
 
+    public boolean isInsideBase(){
+        return isInsideBase;
+    }
+    public void markAsInsideBase(){
+        this.isInsideBase = true;
+    }
     @Override
     public int hashCode() {
         return this.hashCode;

@@ -1,4 +1,4 @@
-package main.java.model;
+package main.java.dots;
 
 import java.awt.*;
 import java.util.Objects;

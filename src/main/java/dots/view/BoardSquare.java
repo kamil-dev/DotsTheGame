@@ -1,6 +1,7 @@
-package main.java.model;
+package main.java.dots.view;
 
-import main.java.model.dataStructures.Dot;
+import main.java.dots.Settings;
+import main.java.dots.model.dataStructures.Dot;
 
 import javax.swing.*;
 import java.awt.*;
