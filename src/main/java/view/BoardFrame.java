@@ -158,8 +158,6 @@ public class BoardFrame extends JFrame {
         infoPanel.add(resignLabel);
         infoPanel.add(saveLabel);
 
-
-
     }
 
 

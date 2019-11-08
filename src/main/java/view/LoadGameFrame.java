@@ -63,5 +63,5 @@ public class LoadGameFrame extends JFrame {
 
         add(settingsPanel);
     }
-    
+
 }
