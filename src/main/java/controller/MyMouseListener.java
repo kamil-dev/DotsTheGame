@@ -33,6 +33,12 @@ public class MyMouseListener implements MouseListener {
         } else if (label.getText().trim().equals("Cancel")){
             frame.setVisible(false);
             MenuFrame menuFrame = new MenuFrame();
+        } else if (label.getText().trim().equals("Load")){
+
+        } else if (label.getText().trim().equals("Save Game")){
+
+        } else if (label.getText().trim().equals("Resign")){
+
         }
 
     }
