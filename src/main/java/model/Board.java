@@ -1,6 +1,7 @@
 package main.java.model;
 
 import main.java.model.dataStructures.*;
+import main.java.view.BoardSquare;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -536,7 +537,10 @@ public class Board {
             if (newCycle.contains(d)) {
                 replaceOldCyclesWithANewOne(newCycle, activePlayer);    // konc1
                 if (isNewCycleABase(newCycle, d, activePlayer)) {
-                    basesOfPlayer[activePlayer].add(createBase(newCycle, activePlayer));
+                    Base base = createBase(newCycle, activePlayer);
+                    basesOfPlayer[activePlayer].add(base);
+                    System.out.println("Base found!");
+                    drawBase(base);
                     baseCreated = true;
                     newCycle = aSecondCycleCreatedByDot(d, newCycle);        // case of the second cycle created by dot
                     if (newCycle != null) {
@@ -682,6 +686,36 @@ public class Board {
 //        }
 //        return isEastBorderDot && isNorthBorderDot && isSouthBorderDot && isWestBorderDot;
 //    }
+    private static void drawBase(Base base){
+        Cycle cycleToDraw = base.getCycle();
+        DotNode dotNode = cycleToDraw.getDotNode();
+        List<Dot> sortedListOfDotsWithinACycle = new ArrayList<>();
+        sortedListOfDotsWithinACycle.add(dotNode.d);
+        while (dotNode.next != null){
+            sortedListOfDotsWithinACycle.add(dotNode.next.d);
+            dotNode = dotNode.next;
+        }
+
+        BoardSquare[][] board = Settings.GAME_SETTINGS.getBoardSquares();
+
+        Dot d;
+        Dot previousD;
+        Dot nextD;
+        for (int i = 0; i < sortedListOfDotsWithinACycle.size() - 1; i++) {
+            if (i != 0) previousD = sortedListOfDotsWithinACycle.get(i - 1);
+            else previousD = sortedListOfDotsWithinACycle.get(sortedListOfDotsWithinACycle.size() - 1);
+
+            if (i != sortedListOfDotsWithinACycle.size() - 1) nextD = sortedListOfDotsWithinACycle.get(i +1);
+            else nextD = sortedListOfDotsWithinACycle.get(0);
+
+            d = sortedListOfDotsWithinACycle.get(i);
+            board[d.getX()][d.getY()].addConnection(previousD);
+            board[d.getX()][d.getY()].addConnection(nextD);
+            board[d.getX()][d.getY()].repaint();
+        }
+
+    }
+
 
     
 }

@@ -184,8 +184,8 @@ public class BoardFrame extends JFrame {
             d = sortedListOfDotsWithinACycle.get(i);
             board[d.getX()][d.getY()].addConnection(previousD);
             board[d.getX()][d.getY()].addConnection(nextD);
+            board[d.getX()][d.getY()].repaint();
         }
-        repaint();
 
     }
 
