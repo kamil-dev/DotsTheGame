@@ -31,6 +31,7 @@ public class Board {
         this.basesOfPlayer[1] = new HashSet<>();
         this.size = size;
         this.freeDotSpacesCount = size * size;
+        int activePlayer = 0;
     }
 
     private boolean isPlacingADotPossible(Dot d){       // checking if d is a border of a cycle is not needed
@@ -294,7 +295,7 @@ public class Board {
         path[pathIndex.get()] = currentDot;
         pathIndex.set(pathIndex.get() + 1);
 
-        System.out.println( "currentDot: " +currentDot.getX() +" " + currentDot.getY());
+        System.out.println( "currentDot: " +currentDot.getX() +" " + currentDot.getY() +" owner:" + currentDot.getOwnerId());
         int x = currentDot.getX();
         int y = currentDot.getY();
         if(x < xmin)
@@ -362,7 +363,7 @@ public class Board {
             if ( y < size -1){
                 neighbouringDot = getDot(x+1,y+1,activePlayer);
                 if( neighbouringDot!= null && !visited.contains(neighbouringDot))
-                    System.out.println("neighb:" + neighbouringDot.getX() + " " + neighbouringDot.getY());
+                    System.out.println("neighb:" + neighbouringDot.getX() + " " + neighbouringDot.getY() );
                 if( neighbouringDot!= null && !visited.contains(neighbouringDot) && findCyclePath(neighbouringDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited, activePlayer) )
                     return true;
             }
@@ -375,51 +376,51 @@ public class Board {
         return false;
     }
 
-    public void boardTest(){
-        addDot( new Dot(10,10,0));
-        addDot( new Dot(11,11,0));
-        addDot( new Dot(12,10,0));
-        Dot addedDot =  new Dot(11,9,0);
-        addDot( addedDot);
-        this.dotNb = 24;
-        Cycle newCycle = aNewCycleCreatedByDot(addedDot);
-        System.out.println( newCycle == null);
-
-        addDot( new Dot(20,20,0));
-        addDot( new Dot(19,21,0));
-        addDot( new Dot(18,22,0));
-        addDot( new Dot(19,23,0));
-        addDot( new Dot(20,23,0));
-        addDot( new Dot(21,22,0));
-        addedDot =  new Dot(21,21,0);
-        addDot( addedDot );
-
-        //zbedne kropki testowe
-        addDot( new Dot(20,21,0));
-        addDot( new Dot(20,19,0));
-        addDot( new Dot(19,22,0));
-        addDot( new Dot(20,21,0));
-        addDot( new Dot(19,24,0));
-        addDot( new Dot(20,24,0));
-        newCycle = aNewCycleCreatedByDot(addedDot);
-        if( newCycle != null) {
-            System.out.println( "cycle found!");
-            newCycle.printCycle();
-        }
-
-    }
+//    public void boardTest(){
+//        addDot( new Dot(10,10,0));
+//        addDot( new Dot(11,11,0));
+//        addDot( new Dot(12,10,0));
+//        Dot addedDot =  new Dot(11,9,0);
+//        addDot( addedDot);
+//        this.dotNb = 24;
+//        Cycle newCycle = aNewCycleCreatedByDot(addedDot);
+//        System.out.println( newCycle == null);
+//
+//        addDot( new Dot(20,20,0));
+//        addDot( new Dot(19,21,0));
+//        addDot( new Dot(18,22,0));
+//        addDot( new Dot(19,23,0));
+//        addDot( new Dot(20,23,0));
+//        addDot( new Dot(21,22,0));
+//        addedDot =  new Dot(21,21,0);
+//        addDot( addedDot );
+//
+//        //zbedne kropki testowe
+//        addDot( new Dot(20,21,0));
+//        addDot( new Dot(20,19,0));
+//        addDot( new Dot(19,22,0));
+//        addDot( new Dot(20,21,0));
+//        addDot( new Dot(19,24,0));
+//        addDot( new Dot(20,24,0));
+//        newCycle = aNewCycleCreatedByDot(addedDot);
+//        if( newCycle != null) {
+//            System.out.println( "cycle found!");
+//            newCycle.printCycle();
+//        }
+//
+//    }
 
     // == in construction ==
     // to raczej trzeba inaczej zrobic: https://www.geeksforgeeks.org/print-all-the-cycles-in-an-undirected-graph/
     Cycle aNewCycleCreatedByDot(Dot addedDot){
         int x = addedDot.getX();
         int y = addedDot.getY();
-        Dot[] path = new Dot[(dotNb+3)/2]; // size == nb of player's dots
+        Dot[] path = new Dot[(dotNb+1)/2+8]; // size == nb of player's dots
         //path[0] = addedDot;
         AtomicInteger pathIndex = new AtomicInteger(0);
         HashSet<Dot> visited = new HashSet<>();     // addedDot is on the path but not visited at start
         if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, activePlayer)){
-            System.out.println("cycle:");
+            System.out.println("cycle found!");
             for (int i = 0; i< pathIndex.get(); i++){
                 Dot ddd = path[i];
                 System.out.println(""+ddd.getX() +", " + ddd.getY());
@@ -439,7 +440,7 @@ public class Board {
         visited.addAll(firstCycle.getDotsSet());
         visited.remove(addedDot);
         if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, activePlayer)){
-            System.out.println("cycle:");
+            System.out.println("second cycle found!");
             for (int i = 0; i< pathIndex.get(); i++){
                 Dot ddd = path[i];
                 System.out.println(""+ddd.getX() +", " + ddd.getY());
@@ -557,6 +558,8 @@ public class Board {
             createBase(newCycle, 1 - activePlayer);
         // konc 2: znajdz wszystkie cykle przeciwnika w których się zawiera Dot d i stwórz baze z najbardziej zewnetrznego
         //       nie lubie tego rozwiazania bo czesto sie wywoluje i cos tam kosztuje.
+
+        this.activePlayer = 1 - this.activePlayer;
     }
 
     public int getSize() {
