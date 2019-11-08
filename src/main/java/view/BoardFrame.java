@@ -57,14 +57,14 @@ public class BoardFrame extends JFrame {
                         super.mouseClicked(e);
                         if (isPlayersOneTurn) {
                             if (bs.getState() == 0) {
-                                settings.getBoard().addDot(new Dot(bs.getRow(), bs.getColumn(), settings.getP1().getId()));
+                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
                                 bs.setState(1);
                                 isPlayersOneTurn = false;
                             }
                         }
                         else {
                             if (bs.getState() == 0) {
-                                settings.getBoard().addDot(new Dot(bs.getRow(), bs.getColumn(), settings.getP1().getId()));
+                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
                                 bs.setState(2);
                                 isPlayersOneTurn = true;
                             }

@@ -20,7 +20,6 @@ public class Settings {
         this.timer = timer;
         this.boardSize = boardSize;
         this.board = new Board(boardSize);
-        this.board.boardTest();
     }
 
     public static void setGameSettings(Player p1, Player p2, int timer, int boardSize) {
