@@ -1,6 +1,7 @@
 package main.java.view;
 
 
+import main.java.controller.BoardSquareMouseListener;
 import main.java.controller.MyMouseListener;
 import main.java.model.Player;
 import main.java.model.Settings;
@@ -26,11 +27,12 @@ public class BoardFrame extends JFrame {
     private int width = 800;
     private int height = 525;
     private Settings settings;
-    private boolean isPlayersOneTurn = true;
     private BoardSquare[][] board;
     private Color c1 = new Color(204, 204, 255);
     private Color c2 = new Color(0, 51, 153);
     private JLabel playerOneTimerLabel, playerTwoTimerLabel;
+    private JLabel scoreLabel = new JLabel();
+    private Timer timer;
 
     public BoardFrame() {
         settings = Settings.GAME_SETTINGS;
@@ -55,31 +57,32 @@ public class BoardFrame extends JFrame {
                 BoardSquare bs = new BoardSquare(i,j);
                 board[i][j] = bs;
                 boardPanel.add(bs);
-                bs.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        super.mouseClicked(e);
-                        if (isPlayersOneTurn) {
-                            if (bs.getState() == 0) {
-                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
-                                bs.setState(1);
-                                isPlayersOneTurn = false;
-                                settings.getP1().setActive(false);
-                                settings.getP2().setActive(true);
-                            }
-                        }
-                        else {
-                            if (bs.getState() == 0) {
-                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
-                                bs.setState(2);
-                                isPlayersOneTurn = true;
-                                settings.getP1().setActive(true);
-                                settings.getP2().setActive(false);
-                            }
-                        }
-                        repaint();
-                    }
-                });
+                bs.addMouseListener(new BoardSquareMouseListener(bs, scoreLabel));
+//                bs.addMouseListener(new MouseAdapter() {
+//                    @Override
+//                    public void mouseClicked(MouseEvent e) {
+//                        super.mouseClicked(e);
+//                        if (isPlayersOneTurn) {
+//                            if (bs.getState() == 0) {
+//                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
+//                                bs.setState(1);
+//                                isPlayersOneTurn = false;
+//                                settings.getP1().setActive(false);
+//                                settings.getP2().setActive(true);
+//                            }
+//                        }
+//                        else {
+//                            if (bs.getState() == 0) {
+//                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
+//                                bs.setState(2);
+//                                isPlayersOneTurn = true;
+//                                settings.getP1().setActive(true);
+//                                settings.getP2().setActive(false);
+//                            }
+//                        }
+//                        repaint();
+//                    }
+//                });
             }
         }
         settings.setBoardSquares(board);
@@ -109,7 +112,6 @@ public class BoardFrame extends JFrame {
         playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,20, 100,20);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        JLabel scoreLabel = new JLabel();
         scoreLabel.setForeground(c2);
         scoreLabel.setFont(font);
         scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
@@ -150,7 +152,7 @@ public class BoardFrame extends JFrame {
         playerOneTimerLabel.setForeground(settings.getP1().getColor());
         playerOneTimerLabel.setBounds(20,60, 120,20);
 
-        Timer timer = new Timer(1000, new ClockListener());
+        timer = new Timer(1000, new ClockListener());
         timer.start();
 
         playerTwoTimerLabel = new JLabel();
@@ -175,15 +177,24 @@ public class BoardFrame extends JFrame {
         Player p1 = Settings.GAME_SETTINGS.getP1();
         Player p2 = Settings.GAME_SETTINGS.getP2();
 
-
         @Override
         public void actionPerformed(ActionEvent e) {
             if (p1.isActive()) {
                 p1.setRemainingTime(p1.getRemainingTime() - 1);
                 playerOneTimerLabel.setText(timerIntoString(p1.getRemainingTime()));
+                if (p1.getRemainingTime() <= 0) {
+                    setVisible(false);
+                    EndFrame endFrame = new EndFrame(p2, EndGameCause.TIMER );
+                    timer.stop();
+                }
             } else {
                 p2.setRemainingTime(p2.getRemainingTime() - 1);
                 playerTwoTimerLabel.setText(timerIntoString(p2.getRemainingTime()));
+                if (p2.getRemainingTime() <= 0) {
+                    setVisible(false);
+                    EndFrame endFrame = new EndFrame(p1, EndGameCause.TIMER );
+                    timer.stop();
+                }
             }
         }
     }
@@ -198,33 +209,33 @@ public class BoardFrame extends JFrame {
     }
 
 
-    private void drawBase(Base base){
-        Cycle cycleToDraw = base.getCycle();
-        DotNode dotNode = cycleToDraw.getDotNode();
-        List<Dot> sortedListOfDotsWithinACycle = new ArrayList<>();
-        sortedListOfDotsWithinACycle.add(dotNode.d);
-        while (dotNode.next != null){
-            sortedListOfDotsWithinACycle.add(dotNode.next.d);
-            dotNode = dotNode.next;
-        }
-
-        Dot d;
-        Dot previousD;
-        Dot nextD;
-        for (int i = 0; i < sortedListOfDotsWithinACycle.size() - 1; i++) {
-            if (i != 0) previousD = sortedListOfDotsWithinACycle.get(i - 1);
-            else previousD = sortedListOfDotsWithinACycle.get(sortedListOfDotsWithinACycle.size() - 1);
-
-            if (i != sortedListOfDotsWithinACycle.size() - 1) nextD = sortedListOfDotsWithinACycle.get(i +1);
-            else nextD = sortedListOfDotsWithinACycle.get(0);
-
-            d = sortedListOfDotsWithinACycle.get(i);
-            board[d.getX()][d.getY()].addConnection(previousD);
-            board[d.getX()][d.getY()].addConnection(nextD);
-            board[d.getX()][d.getY()].repaint();
-        }
-
-    }
+//    private void drawBase(Base base){
+//        Cycle cycleToDraw = base.getCycle();
+//        DotNode dotNode = cycleToDraw.getDotNode();
+//        List<Dot> sortedListOfDotsWithinACycle = new ArrayList<>();
+//        sortedListOfDotsWithinACycle.add(dotNode.d);
+//        while (dotNode.next != null){
+//            sortedListOfDotsWithinACycle.add(dotNode.next.d);
+//            dotNode = dotNode.next;
+//        }
+//
+//        Dot d;
+//        Dot previousD;
+//        Dot nextD;
+//        for (int i = 0; i < sortedListOfDotsWithinACycle.size() - 1; i++) {
+//            if (i != 0) previousD = sortedListOfDotsWithinACycle.get(i - 1);
+//            else previousD = sortedListOfDotsWithinACycle.get(sortedListOfDotsWithinACycle.size() - 1);
+//
+//            if (i != sortedListOfDotsWithinACycle.size() - 1) nextD = sortedListOfDotsWithinACycle.get(i +1);
+//            else nextD = sortedListOfDotsWithinACycle.get(0);
+//
+//            d = sortedListOfDotsWithinACycle.get(i);
+//            board[d.getX()][d.getY()].addConnection(previousD);
+//            board[d.getX()][d.getY()].addConnection(nextD);
+//            board[d.getX()][d.getY()].repaint();
+//        }
+//
+//    }
 
 
 }

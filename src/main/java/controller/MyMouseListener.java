@@ -42,7 +42,7 @@ public class MyMouseListener implements MouseListener {
             frame.setVisible(false);
             Player p1 = Settings.GAME_SETTINGS.getP1();
             Player p2 = Settings.GAME_SETTINGS.getP2();
-            EndFrame endFrame = new EndFrame(p1.isActive() ? p2 : p1 );
+            EndFrame endFrame = new EndFrame(p1.isActive() ? p2 : p1, EndGameCause.RESIGNATION );
 
         } else if (labelText.equals("Accept")){
             SettingsFrame sf = (SettingsFrame)frame;

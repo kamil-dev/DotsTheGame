@@ -584,8 +584,6 @@ public class Board {
                 if (isNewCycleABase(newCycle, d, activePlayer)) {
                     Base base = createBase(newCycle, activePlayer);
                     basesOfPlayer[activePlayer].add(base);
-                    System.out.println("Base found!");
-                    base.getCycle().printCycle();
                     drawBase(base);
                     baseCreated = true;
                 }
@@ -596,7 +594,9 @@ public class Board {
                     if (newCycle.contains(d)) {
                         replaceOldCyclesWithANewOne(newCycle, activePlayer);    // konc1
                         if (isNewCycleABase(newCycle, d, activePlayer)) {
-                            basesOfPlayer[activePlayer].add(createBase(newCycle, activePlayer));
+                            Base base = createBase(newCycle, activePlayer);
+                            basesOfPlayer[activePlayer].add(base);
+                            drawBase(base);
                             baseCreated = true;
                         }
                     }
@@ -611,7 +611,7 @@ public class Board {
             createBase(newCycle, 1 - activePlayer);
         // konc 2: znajdz wszystkie cykle przeciwnika w których się zawiera Dot d i stwórz baze z najbardziej zewnetrznego
         //       nie lubie tego rozwiazania bo czesto sie wywoluje i cos tam kosztuje.
-
+        if(baseCreated) updatePoints(activePlayer);
         this.activePlayer = 1 - this.activePlayer;
     }
 
@@ -767,6 +767,15 @@ public class Board {
             board[d.getX()][d.getY()].repaint();
         }
 
+    }
+
+    private void updatePoints(int activePlayer){
+        int activePlayerPointsCount = 0;
+        for (Base b : basesOfPlayer[activePlayer]){
+            activePlayerPointsCount += b.getPointsCount();
+        }
+        if (activePlayer == 0) Settings.GAME_SETTINGS.getP1().setPoints(activePlayerPointsCount);
+        else Settings.GAME_SETTINGS.getP2().setPoints(activePlayerPointsCount);
     }
 
 
