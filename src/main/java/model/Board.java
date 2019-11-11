@@ -540,6 +540,7 @@ public class Board {
                     Base base = createBase(newCycle, activePlayer);
                     basesOfPlayer[activePlayer].add(base);
                     System.out.println("Base found!");
+                    base.getCycle().printCycle();
                     drawBase(base);
                     baseCreated = true;
                     newCycle = aSecondCycleCreatedByDot(d, newCycle);        // case of the second cycle created by dot
@@ -699,9 +700,10 @@ public class Board {
         BoardSquare[][] board = Settings.GAME_SETTINGS.getBoardSquares();
 
         Dot d;
+
         Dot previousD;
         Dot nextD;
-        for (int i = 0; i < sortedListOfDotsWithinACycle.size() - 1; i++) {
+        for (int i = 0; i < sortedListOfDotsWithinACycle.size(); i++) {
             if (i != 0) previousD = sortedListOfDotsWithinACycle.get(i - 1);
             else previousD = sortedListOfDotsWithinACycle.get(sortedListOfDotsWithinACycle.size() - 1);
 
@@ -709,6 +711,9 @@ public class Board {
             else nextD = sortedListOfDotsWithinACycle.get(0);
 
             d = sortedListOfDotsWithinACycle.get(i);
+            System.out.println("current dot: " + d.toString());
+            System.out.println("previous dot: " + previousD.toString());
+            System.out.println("next dot: " + nextD.toString());
             board[d.getX()][d.getY()].addConnection(previousD);
             board[d.getX()][d.getY()].addConnection(nextD);
             board[d.getX()][d.getY()].repaint();

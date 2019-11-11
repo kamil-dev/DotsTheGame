@@ -39,6 +39,10 @@ public class MyMouseListener implements MouseListener {
         } else if (labelText.equals("Save Game")){
 
         } else if (labelText.equals("Resign")){
+            frame.setVisible(false);
+            Player p1 = Settings.GAME_SETTINGS.getP1();
+            Player p2 = Settings.GAME_SETTINGS.getP2();
+            EndFrame endFrame = new EndFrame(p1.isActive() ? p2 : p1 );
 
         } else if (labelText.equals("Accept")){
             SettingsFrame sf = (SettingsFrame)frame;
@@ -50,7 +54,7 @@ public class MyMouseListener implements MouseListener {
                     size == null || size > 40 || size < 10 || timer == null || sf.getTimer() <= 0){
                 MyErrorFrame frame = new MyErrorFrame();
             } else {
-                Settings.setGameSettings(new Player(1,sf.getP1Color(), timer, sf.getP1Name()), new Player(0, sf.getP2Color(), timer, sf.getP2Name()) , timer, size);
+                Settings.setGameSettings(new Player(1,sf.getP1Color(), timer, sf.getP1Name(),true), new Player(0, sf.getP2Color(), timer, sf.getP2Name(),false) , timer, size);
                 MenuFrame menuFrame = new MenuFrame();
             }
         }

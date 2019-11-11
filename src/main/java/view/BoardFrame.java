@@ -2,6 +2,7 @@ package main.java.view;
 
 
 import main.java.controller.MyMouseListener;
+import main.java.model.Player;
 import main.java.model.Settings;
 import main.java.model.dataStructures.Base;
 import main.java.model.dataStructures.Cycle;
@@ -11,6 +12,8 @@ import main.java.model.dataStructures.DotNode;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -27,6 +30,7 @@ public class BoardFrame extends JFrame {
     private BoardSquare[][] board;
     private Color c1 = new Color(204, 204, 255);
     private Color c2 = new Color(0, 51, 153);
+    private JLabel playerOneTimerLabel, playerTwoTimerLabel;
 
     public BoardFrame() {
         settings = Settings.GAME_SETTINGS;
@@ -60,6 +64,8 @@ public class BoardFrame extends JFrame {
                                 settings.getBoard().addDot(bs.getRow(), bs.getColumn());
                                 bs.setState(1);
                                 isPlayersOneTurn = false;
+                                settings.getP1().setActive(false);
+                                settings.getP2().setActive(true);
                             }
                         }
                         else {
@@ -67,6 +73,8 @@ public class BoardFrame extends JFrame {
                                 settings.getBoard().addDot(bs.getRow(), bs.getColumn());
                                 bs.setState(2);
                                 isPlayersOneTurn = true;
+                                settings.getP1().setActive(true);
+                                settings.getP2().setActive(false);
                             }
                         }
                         repaint();
@@ -98,7 +106,7 @@ public class BoardFrame extends JFrame {
         playerTwoLabel.setText(settings.getP2().getName());
         playerTwoLabel.setFont(font);
         playerTwoLabel.setForeground(settings.getP2().getColor());
-        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 120,20, 100,20);
+        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,20, 100,20);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         JLabel scoreLabel = new JLabel();
@@ -136,17 +144,20 @@ public class BoardFrame extends JFrame {
         Font timerFont = new Font("Arial", Font.ITALIC, 16);
 
 
-        JLabel playerOneTimerLabel = new JLabel();
-        playerOneTimerLabel.setText(settings.getP1().getRemainingTime() + " s");
+        playerOneTimerLabel = new JLabel();
+        playerOneTimerLabel.setText(timerIntoString(settings.getP1().getRemainingTime()));
         playerOneTimerLabel.setFont(timerFont);
         playerOneTimerLabel.setForeground(settings.getP1().getColor());
-        playerOneTimerLabel.setBounds(20,60, 100,20);
+        playerOneTimerLabel.setBounds(20,60, 120,20);
 
-        JLabel playerTwoTimerLabel = new JLabel();
-        playerTwoTimerLabel.setText(settings.getP2().getRemainingTime() + " s");
+        Timer timer = new Timer(1000, new ClockListener());
+        timer.start();
+
+        playerTwoTimerLabel = new JLabel();
+        playerTwoTimerLabel.setText(timerIntoString(settings.getP2().getRemainingTime()));
         playerTwoTimerLabel.setFont(timerFont);
         playerTwoTimerLabel.setForeground(settings.getP2().getColor());
-        playerTwoTimerLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 120,60, 100,20);
+        playerTwoTimerLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,60, 120,20);
         playerTwoTimerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
 
@@ -157,6 +168,32 @@ public class BoardFrame extends JFrame {
         infoPanel.add(scoreLabel);
         infoPanel.add(resignLabel);
         infoPanel.add(saveLabel);
+
+    }
+
+    private class ClockListener implements ActionListener {
+        Player p1 = Settings.GAME_SETTINGS.getP1();
+        Player p2 = Settings.GAME_SETTINGS.getP2();
+
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (p1.isActive()) {
+                p1.setRemainingTime(p1.getRemainingTime() - 1);
+                playerOneTimerLabel.setText(timerIntoString(p1.getRemainingTime()));
+            } else {
+                p2.setRemainingTime(p2.getRemainingTime() - 1);
+                playerTwoTimerLabel.setText(timerIntoString(p2.getRemainingTime()));
+            }
+        }
+    }
+
+    private static String timerIntoString(int timeInSeconds){
+        int sec = timeInSeconds % 60;
+        int min = ((timeInSeconds - sec)/60) % 60;
+        int hours = (((timeInSeconds - sec)/60) - min)/60;
+
+        return "" + (hours>0 ? hours : 0) + "h : " + min + "m : " + sec + "s";
 
     }
 

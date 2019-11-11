@@ -82,7 +82,7 @@ public class SettingsFrame extends JFrame {
         boardSizeTextField = new JTextField();
         boardSizeTextField.setBounds(160,height - 140,50,20);
 
-        JLabel timerLabel = new JLabel("Timer:");
+        JLabel timerLabel = new JLabel("Timer (s):");
         timerLabel.setForeground(c2);
         timerLabel.setFont(fontNormal);
         timerLabel.setBounds(50,height - 100,100,20);
