@@ -16,10 +16,10 @@ public class LoadGameFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
-        createPanel();
+        createForm();
     }
 
-    private void createPanel(){
+    private void createForm(){
         JPanel settingsPanel = new JPanel();
         add(settingsPanel, BorderLayout.CENTER);
         Color c1 = new Color(204, 204, 255);
@@ -52,6 +52,7 @@ public class LoadGameFrame extends JFrame {
         cancelLabel.addMouseListener(new MyMouseListener(cancelLabel,this));
         cancelLabel.setForeground(c2);
 
+
         settingsPanel.add(fileNameLabel);
         settingsPanel.add(Box.createRigidArea(new Dimension(0, 30)));
         settingsPanel.add(fileNameTextField);
@@ -62,4 +63,5 @@ public class LoadGameFrame extends JFrame {
 
         add(settingsPanel);
     }
+
 }
