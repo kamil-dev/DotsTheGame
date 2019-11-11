@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b83d14a1-b1f4-4761-8a08-367d1c7f99de" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/dataStructures/Base.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/dataStructures/Base.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/model/dataStructures/Cycle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/dataStructures/Cycle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/dataStructures/Dot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/dataStructures/Dot.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -68,16 +65,16 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/model/dataStructures/Cycle.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="196" column="69" selection-start-line="196" selection-start-column="69" selection-end-line="196" selection-end-column="69" />
+            <state relative-caret-position="194">
+              <caret line="185" column="23" lean-forward="true" selection-start-line="185" selection-start-column="23" selection-end-line="185" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#9251#9252#0" expanded="true" />
-                <element signature="e#9306#9307#0" expanded="true" />
-                <element signature="e#9361#9362#0" expanded="true" />
-                <element signature="e#9416#9417#0" expanded="true" />
-                <element signature="e#9481#9482#0" expanded="true" />
-                <element signature="e#9551#9552#0" expanded="true" />
+                <element signature="e#9658#9659#0" expanded="true" />
+                <element signature="e#9713#9714#0" expanded="true" />
+                <element signature="e#9768#9769#0" expanded="true" />
+                <element signature="e#9823#9824#0" expanded="true" />
+                <element signature="e#9888#9889#0" expanded="true" />
+                <element signature="e#9958#9959#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -503,7 +500,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1448" height="864" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19722222" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -515,7 +511,7 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3285528" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3285528" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3285528" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39895698" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -768,16 +764,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/model/dataStructures/Cycle.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="196" column="69" selection-start-line="196" selection-start-column="69" selection-end-line="196" selection-end-column="69" />
+        <state relative-caret-position="194">
+          <caret line="185" column="23" lean-forward="true" selection-start-line="185" selection-start-column="23" selection-end-line="185" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#9251#9252#0" expanded="true" />
-            <element signature="e#9306#9307#0" expanded="true" />
-            <element signature="e#9361#9362#0" expanded="true" />
-            <element signature="e#9416#9417#0" expanded="true" />
-            <element signature="e#9481#9482#0" expanded="true" />
-            <element signature="e#9551#9552#0" expanded="true" />
+            <element signature="e#9658#9659#0" expanded="true" />
+            <element signature="e#9713#9714#0" expanded="true" />
+            <element signature="e#9768#9769#0" expanded="true" />
+            <element signature="e#9823#9824#0" expanded="true" />
+            <element signature="e#9888#9889#0" expanded="true" />
+            <element signature="e#9958#9959#0" expanded="true" />
           </folding>
         </state>
       </provider>
