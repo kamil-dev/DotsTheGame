@@ -29,10 +29,6 @@ public class Dot {
         return ownerId;
     }
 
-    public void setAsLocked() {
-        isInsideBase = true;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -44,9 +40,11 @@ public class Dot {
     public boolean isInsideBase(){
         return isInsideBase;
     }
+
     public void markAsInsideBase(){
         this.isInsideBase = true;
     }
+
     @Override
     public int hashCode() {
         return this.hashCode;

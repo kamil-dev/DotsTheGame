@@ -57,6 +57,29 @@ public class Base implements ICycle{
         return ownerId;
     }
 
+    public void setPointsCount(int pointsCount) {
+        this.pointsCount = pointsCount;
+    }
+
+    public DotNode getDotNode(){
+        return this.cycle.getDotNode();
+    }
+//    public int getXmin() {
+//        return cycle.getXmin();
+//    }
+//
+//    public int getXmax() {
+//        return cycle.getXmax();
+//    }
+//
+//    public int getYmin() {
+//        return cycle.getYmin();
+//    }
+//
+//    public int getYmax() {
+//        return cycle.getYmax();
+//    }
+
     public int getPointsCount() {
         return pointsCount;
     }
