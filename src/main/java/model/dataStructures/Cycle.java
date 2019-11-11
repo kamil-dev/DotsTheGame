@@ -174,6 +174,18 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         return dotNode.next;
     }
 
+    //including DotNode excluding Dot
+    private DotNode removePathFromDotNodeToDot(DotNode fromDnc, Dot toDot){
+        while (!fromDnc.d.equals(toDot)) {     // remove old path dots from cycle  //
+            removeDotNodeFromCyclesDataStructures(fromDnc);
+            System.out.println("ttuu");
+            fromDnc = fromDnc.next!=null ? fromDnc.next : this.dotNode;
+        }
+        removeDotNodeFromCyclesDataStructures(fromDnc);
+        fromDnc = fromDnc.next;
+        return fromDnc;
+    }
+
     public void cutBase(DotNode firstDnc, Base base){
         Dot firstDot = firstDnc.d;
         List<DotNode> dnbsOnFirstDncX = base.getCycle().dotsHorrizontally.get(firstDot.getX());
@@ -186,18 +198,14 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
 
         DotNode dnc = firstDnc;
         if (firstDnbNext.d != firstDncNext.d) {     // base cycle goes in an opposite direction - cool
-            DotNode dnBNewPath = firstDnbNext;
-            while (!this.contains(dnBNewPath.d)) {     // add new path dots to cycle   // potencjalnie tu może zawisnac przy zlej implementacji
-                dnc.next = addDotToCyclesDataStructures(dnBNewPath.d);
-                dnBNewPath = dnBNewPath.next!=null ? dnBNewPath.next : base.getDotNode();
+            DotNode dnbNewPath = firstDnbNext;
+            while (!this.contains(dnbNewPath.d)) {     // add new path dots to cycle   // potencjalnie tu może zawisnac przy zlej implementacji
+                dnc.next = addDotToCyclesDataStructures(dnbNewPath.d);
+                dnc = dnc.next;
+                dnbNewPath = dnbNewPath.next!=null ? dnbNewPath.next : base.getDotNode();
             }
-            //dnc.next =
-            DotNode lastDncOnBase = firstDncNext;
-            while (!lastDncOnBase.d.equals(dnBNewPath.d)) {     // remove old path dots from cycle
-                removeDotNodeFromCyclesDataStructures(lastDncOnBase);
-                lastDncOnBase = lastDncOnBase.next;
-            }
-            dnc.next = lastDncOnBase;
+            // dnbNewPath contains the first dot on alternative path contained both by base and cycle
+            dnc.next = removePathFromDotNodeToDot(firstDncNext,dnbNewPath.d);    // remove old path dots from cycle  //
         }
         else {      // base cycle goes in the same direction as cycle
             DotNode[] path = new DotNode[dotsSet.size() + base.getCycle().dotsSet.size()];
