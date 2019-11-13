@@ -3,6 +3,7 @@ package main.java.model;
 import main.java.model.dataStructures.*;
 import main.java.view.BoardSquare;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
      CLASS IN CONSTRUCTION!!!!!
     ==========================
  */
-public class Board {
+public class Board implements Serializable {
     private Dot[][] matrixOfDots;
     private int size;
     private int dotNb = 1;
@@ -611,7 +612,7 @@ public class Board {
             createBase(newCycle, 1 - activePlayer);
         // konc 2: znajdz wszystkie cykle przeciwnika w których się zawiera Dot d i stwórz baze z najbardziej zewnetrznego
         //       nie lubie tego rozwiazania bo czesto sie wywoluje i cos tam kosztuje.
-        if(baseCreated) updatePoints(activePlayer);
+        updatePoints(activePlayer);
         this.activePlayer = 1 - this.activePlayer;
     }
 
@@ -745,7 +746,7 @@ public class Board {
             dotNode = dotNode.next;
         }
 
-        BoardSquare[][] board = Settings.GAME_SETTINGS.getBoardSquares();
+        BoardSquare[][] board = Settings.gameSettings.getBoardSquares();
 
         Dot d;
 
@@ -770,12 +771,16 @@ public class Board {
     }
 
     private void updatePoints(int activePlayer){
-        int activePlayerPointsCount = 0;
-        for (Base b : basesOfPlayer[activePlayer]){
-            activePlayerPointsCount += b.getPointsCount();
+        int playerOnePointsCount = 0;
+        for (Base b : basesOfPlayer[0]){
+            playerOnePointsCount += b.getPointsCount();
         }
-        if (activePlayer == 0) Settings.GAME_SETTINGS.getP1().setPoints(activePlayerPointsCount);
-        else Settings.GAME_SETTINGS.getP2().setPoints(activePlayerPointsCount);
+        int playerTwoPointsCount = 0;
+        for (Base b : basesOfPlayer[1]){
+            playerTwoPointsCount += b.getPointsCount();
+        }
+        Settings.gameSettings.getP1().setPoints(playerOnePointsCount);
+        Settings.gameSettings.getP2().setPoints(playerTwoPointsCount);
     }
 
 

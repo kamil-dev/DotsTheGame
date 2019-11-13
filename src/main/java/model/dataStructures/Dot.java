@@ -1,6 +1,8 @@
 package main.java.model.dataStructures;
 
-public class Dot {
+import java.io.Serializable;
+
+public class Dot implements Serializable {
     private int x;
     private int y;
     private int hashCode;

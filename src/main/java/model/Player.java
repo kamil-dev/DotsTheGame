@@ -1,9 +1,10 @@
 package main.java.model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Player {
+public class Player implements Serializable {
     int id;
     private String name;
     private Color color;

@@ -15,8 +15,14 @@ public class EndFrame extends JFrame {
     private int height = 425;
     private Player winner;
     private EndGameCause cause;
+    private Color backgroundColor;
+    private Color foregroundColor;
+    private Font font;
 
     public EndFrame(Player winner, EndGameCause cause){
+        font = new Font("Arial",Font.BOLD,16);
+        foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
+        backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
         setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -31,32 +37,29 @@ public class EndFrame extends JFrame {
         JPanel endPanel = new JPanel();
         endPanel.setLayout(null);
         add(endPanel, BorderLayout.CENTER);
-        Color c1 = new Color(204, 204, 255);
-        Color c2 = new Color(0, 51, 153);
-        Font font = new Font("Arial",Font.BOLD,16);
 
         JLabel congratsLabel = new JLabel("Congratulations!");
-        congratsLabel.setForeground(c2);
+        congratsLabel.setForeground(foregroundColor);
         congratsLabel.setFont(font);
         congratsLabel.setBounds(150,50,200,20);
         congratsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel winnersNameLabel = new JLabel(winner.getName() + " has won the game");
-        winnersNameLabel.setForeground(c2);
+        winnersNameLabel.setForeground(foregroundColor);
         winnersNameLabel.setFont(font);
         winnersNameLabel.setBounds(100,100,300,20);
         winnersNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel messageLabel = new JLabel();
         messageLabel.setText(cause.getText());
-        messageLabel.setForeground(c2);
+        messageLabel.setForeground(foregroundColor);
         messageLabel.setFont(font);
         messageLabel.setBounds(100,150,300,20);
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JLabel scoreLabel = new JLabel();
-        scoreLabel.setText("Final score was: " + Settings.GAME_SETTINGS.getP1().getPoints() + " : " + Settings.GAME_SETTINGS.getP2().getPoints());
-        scoreLabel.setForeground(c2);
+        scoreLabel.setText("Final score was: " + Settings.gameSettings.getP1().getPoints() + " : " + Settings.gameSettings.getP2().getPoints());
+        scoreLabel.setForeground(foregroundColor);
         scoreLabel.setFont(font);
         scoreLabel.setBounds(100,200,300,20);
         scoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -70,8 +73,7 @@ public class EndFrame extends JFrame {
             System.err.println("The game name icon could not be read");
         }
 
-
-        endPanel.setBackground(c1);
+        endPanel.setBackground(backgroundColor);
         endPanel.add(congratsLabel);
         endPanel.add(winnersNameLabel);
         endPanel.add(messageLabel);

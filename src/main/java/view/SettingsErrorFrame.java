@@ -3,11 +3,11 @@ package main.java.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyErrorFrame extends JFrame {
+public class SettingsErrorFrame extends JFrame {
     private int width = 300;
     private int height = 225;
 
-    public MyErrorFrame(){
+    public SettingsErrorFrame(){
         setSize(width,height);
         setLocation(400,400);
         setLayout(new BorderLayout());

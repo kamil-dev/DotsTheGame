@@ -4,6 +4,7 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     ==========================
  */
 
-public class Cycle implements main.java.model.dataStructures.ICycle {
+public class Cycle implements main.java.model.dataStructures.ICycle, Serializable {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;

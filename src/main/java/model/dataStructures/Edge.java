@@ -2,7 +2,9 @@
  Author: Marcin Bartosiak */
 package main.java.model.dataStructures;
 
-public class Edge {
+import java.io.Serializable;
+
+public class Edge implements Serializable {
     private Dot d1;
     private Dot d2;
     private int hashCode;

@@ -1,7 +1,8 @@
 package main.java.view;
 
 
-import main.java.controller.MyMouseListener;
+import main.java.controller.NavigateMouseListener;
+import main.java.model.Settings;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +15,9 @@ import java.io.IOException;
 public class MenuFrame extends JFrame {
     private int width = 500;
     private int height = 525;
+    private Color backgroundColor;
+    private Color foregroundColor;
+    private Font font;
 
     public MenuFrame(){
         setSize(width,height);
@@ -21,21 +25,20 @@ public class MenuFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
+        backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
+        foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
+        font = Settings.gameSettings.getGlobalTheme().getFontLarge();
         createPanel();
     }
 
     private void createPanel(){
         JPanel menuPanel = new JPanel();
         add(menuPanel,BorderLayout.CENTER);
-        Color c1 = new Color(204, 204, 255);
-        Color c2 = new Color(0, 51, 153);
 
-        menuPanel.setBackground(c1);
+        menuPanel.setBackground(backgroundColor);
         BoxLayout layout = new BoxLayout(menuPanel,BoxLayout.Y_AXIS);
         menuPanel.setLayout(layout);
         menuPanel.setBorder(new EmptyBorder(new Insets(100, 180, 150, 180)));
-
-        Font font = new Font("Arial",Font.BOLD,20);
 
         try {
             BufferedImage gameNameIcon = ImageIO.read(new File("src\\main\\resources\\picturetopeople.org-d3b02807efef49a5e8992c90051993385db6615ff94978b17a.png"));
@@ -49,20 +52,20 @@ public class MenuFrame extends JFrame {
         JLabel play = new JLabel();
         play.setText("      Play");
         play.setFont(font);
-        play.addMouseListener(new MyMouseListener(play,this));
-        play.setForeground(c2);
+        play.addMouseListener(new NavigateMouseListener(play,this));
+        play.setForeground(foregroundColor);
 
         JLabel loadGame = new JLabel();
         loadGame.setText("Load Game");
         loadGame.setFont(font);
-        loadGame.addMouseListener(new MyMouseListener(loadGame,this));
-        loadGame.setForeground(c2);
+        loadGame.addMouseListener(new NavigateMouseListener(loadGame,this));
+        loadGame.setForeground(foregroundColor);
 
         JLabel settings = new JLabel();
         settings.setText("   Settings");
         settings.setFont(font);
-        settings.addMouseListener(new MyMouseListener(settings,this));
-        settings.setForeground(c2);
+        settings.addMouseListener(new NavigateMouseListener(settings,this));
+        settings.setForeground(foregroundColor);
 
         menuPanel.add(play);
         menuPanel.add(Box.createRigidArea(new Dimension(0, 30)));

@@ -1,6 +1,7 @@
 package main.java.view;
 
-import main.java.controller.MyMouseListener;
+import main.java.controller.NavigateMouseListener;
+import main.java.model.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,8 @@ public class SettingsFrame extends JFrame {
     private Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.WHITE, Color.BLACK};
     private JTextField timerTextField, boardSizeTextField, playerOneNameTextField, playerTwoNameTextField;
     private JComboBox<Color> playerOneComboBox, playerTwoComboBox;
+    private Color backgroundColor, foregroundColor;
+    private Font fontLarge, fontNormal;
 
     public SettingsFrame(){
         setSize(width,height);
@@ -18,6 +21,10 @@ public class SettingsFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
+        backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
+        foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
+        fontLarge = Settings.gameSettings.getGlobalTheme().getFontLarge();
+        fontNormal = Settings.gameSettings.getGlobalTheme().getFontNormal();
         createPanel();
     }
 
@@ -25,26 +32,22 @@ public class SettingsFrame extends JFrame {
         JPanel settingsPanel = new JPanel();
         add(settingsPanel, BorderLayout.CENTER);
         settingsPanel.setLayout(null);
-        Color c1 = new Color(204, 204, 255);
-        Color c2 = new Color(0, 51, 153);
-        Font fontLarge = new Font("Arial",Font.BOLD,18);
-        Font fontNormal = new Font("Arial",Font.PLAIN,16);
 
-        settingsPanel.setBackground(c1);
+        settingsPanel.setBackground(backgroundColor);
 
-        JLabel playerOneLabel = new JLabel("Player One");
+        JLabel playerOneLabel = new JLabel("Player 1");
         playerOneLabel.setBounds(50,20, 100,20);
         playerOneLabel.setFont(fontLarge);
-        playerOneLabel.setForeground(c2);
+        playerOneLabel.setForeground(foregroundColor);
 
-        JLabel playerTwoLabel = new JLabel("Player Two");
+        JLabel playerTwoLabel = new JLabel("Player 2");
         playerTwoLabel.setBounds( width - 150,20, 100,20);
         playerTwoLabel.setFont(fontLarge);
-        playerTwoLabel.setForeground(c2);
+        playerTwoLabel.setForeground(foregroundColor);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         JLabel nameLabel = new JLabel("name");
-        nameLabel.setForeground(c2);
+        nameLabel.setForeground(foregroundColor);
         nameLabel.setFont(fontNormal);
         nameLabel.setBounds(width - 300, 60, 100, 20);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -56,7 +59,7 @@ public class SettingsFrame extends JFrame {
         playerTwoNameTextField.setBounds(width - 150,60,100,20);
 
         JLabel colorLabel = new JLabel("color");
-        colorLabel.setForeground(c2);
+        colorLabel.setForeground(foregroundColor);
         colorLabel.setFont(fontNormal);
         colorLabel.setBounds(width - 300, 100, 100, 20);
         colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -75,7 +78,7 @@ public class SettingsFrame extends JFrame {
         playerTwoComboBox.setRenderer(renderer);
 
         JLabel boardSizeLabel = new JLabel("Board Size:");
-        boardSizeLabel.setForeground(c2);
+        boardSizeLabel.setForeground(foregroundColor);
         boardSizeLabel.setFont(fontNormal);
         boardSizeLabel.setBounds(50,height - 140,100,20);
 
@@ -83,7 +86,7 @@ public class SettingsFrame extends JFrame {
         boardSizeTextField.setBounds(160,height - 140,50,20);
 
         JLabel timerLabel = new JLabel("Timer (s):");
-        timerLabel.setForeground(c2);
+        timerLabel.setForeground(foregroundColor);
         timerLabel.setFont(fontNormal);
         timerLabel.setBounds(50,height - 100,100,20);
 
@@ -92,16 +95,16 @@ public class SettingsFrame extends JFrame {
 
 
         JLabel acceptLabel = new JLabel("Accept");
-        acceptLabel.setForeground(c2);
+        acceptLabel.setForeground(foregroundColor);
         acceptLabel.setFont(fontLarge);
-        acceptLabel.addMouseListener(new MyMouseListener(acceptLabel, this));
+        acceptLabel.addMouseListener(new NavigateMouseListener(acceptLabel, this));
         acceptLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         acceptLabel.setBounds(width - 150,height - 140, 100,20);
 
         JLabel cancelLabel = new JLabel("Cancel");
         cancelLabel.setFont(fontLarge);
-        cancelLabel.setForeground(c2);
-        cancelLabel.addMouseListener(new MyMouseListener(cancelLabel, this));
+        cancelLabel.setForeground(foregroundColor);
+        cancelLabel.addMouseListener(new NavigateMouseListener(cancelLabel, this));
         cancelLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         cancelLabel.setBounds(width - 150,height - 100, 100,20);
 

@@ -5,10 +5,11 @@ import main.java.model.dataStructures.Dot;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BoardSquare extends JPanel {
+public class BoardSquare extends JPanel implements Serializable {
     private int column;
     private int row;
     private Settings settings;
@@ -18,10 +19,10 @@ public class BoardSquare extends JPanel {
     public BoardSquare(int row, int column) {
         this.row = row;
         this.column = column;
-        this.settings = Settings.GAME_SETTINGS;
+        this.settings = Settings.gameSettings;
     }
 
-    public void setConnections(List<Dot> connections){
+    public void setConnections(List<Dot> connections) {
         this.connections.addAll(connections);
     }
     public void addConnection(Dot connectedDot){
@@ -47,7 +48,7 @@ public class BoardSquare extends JPanel {
         if (column == lastRowAndColIndex) g.drawLine(width,0,width,height);
 
 
-        Color c = null;
+        Color c;
         if (state != 0) {
             if (state == 1) c = settings.getP1().getColor(); else c = settings.getP2().getColor();
 

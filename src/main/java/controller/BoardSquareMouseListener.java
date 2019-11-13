@@ -6,15 +6,16 @@ import main.java.view.BoardSquare;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
-public class BoardSquareMouseListener extends MouseAdapter {
+public class BoardSquareMouseListener extends MouseAdapter implements Serializable {
     private BoardSquare bs;
     private Settings settings;
     private JLabel scoreLabel;
 
     public BoardSquareMouseListener(BoardSquare bs, JLabel scoreLabel) {
         this.bs = bs;
-        this.settings = Settings.GAME_SETTINGS;
+        this.settings = Settings.gameSettings;
         this.scoreLabel = scoreLabel;
     }
 

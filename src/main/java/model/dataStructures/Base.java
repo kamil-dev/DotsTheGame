@@ -4,13 +4,15 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
+import java.io.Serializable;
+
 /*
     ==========================
      CLASS IN CONSTRUCTION!!!!!
     ==========================
  */
 
-public class Base implements ICycle{
+public class Base implements ICycle, Serializable {
     private int ownerId;
     private Cycle cycle;
     private Board board;

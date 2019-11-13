@@ -2,40 +2,37 @@ package main.java.view;
 
 
 import main.java.controller.BoardSquareMouseListener;
-import main.java.controller.MyMouseListener;
+import main.java.controller.NavigateMouseListener;
 import main.java.model.Player;
 import main.java.model.Settings;
-import main.java.model.dataStructures.Base;
-import main.java.model.dataStructures.Cycle;
-import main.java.model.dataStructures.Dot;
-import main.java.model.dataStructures.DotNode;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BoardFrame extends JFrame {
     private int width = 800;
     private int height = 525;
     private Settings settings;
     private BoardSquare[][] board;
-    private Color c1 = new Color(204, 204, 255);
-    private Color c2 = new Color(0, 51, 153);
+    private Color backgroundColor;
+    private Color foregroundColor;
+    private Font font;
     private JLabel playerOneTimerLabel, playerTwoTimerLabel;
-    private JLabel scoreLabel = new JLabel();
+    private JLabel scoreLabel;
     private Timer timer;
 
     public BoardFrame() {
-        settings = Settings.GAME_SETTINGS;
+        settings = Settings.gameSettings;
+        backgroundColor = settings.getGlobalTheme().getBackgroundColor();
+        foregroundColor = settings.getGlobalTheme().getForegroundColor();
+        font = settings.getGlobalTheme().getFontLarge();
+        scoreLabel = new JLabel();
         setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -46,83 +43,66 @@ public class BoardFrame extends JFrame {
         createInfoPanel();
     }
 
+
     private void createBoard(){
         int size = settings.getBoardSize();
         JPanel boardPanel = new JPanel();
-        boardPanel.setBackground(c1);
+        boardPanel.setBackground(backgroundColor);
         boardPanel.setLayout(new GridLayout(size,size));
-        board = new BoardSquare[size][size];
-        for (int i = 0; i < size ; i++) {
-            for (int j = 0; j < size ; j++) {
-                BoardSquare bs = new BoardSquare(i,j);
-                board[i][j] = bs;
-                boardPanel.add(bs);
-                bs.addMouseListener(new BoardSquareMouseListener(bs, scoreLabel));
-//                bs.addMouseListener(new MouseAdapter() {
-//                    @Override
-//                    public void mouseClicked(MouseEvent e) {
-//                        super.mouseClicked(e);
-//                        if (isPlayersOneTurn) {
-//                            if (bs.getState() == 0) {
-//                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
-//                                bs.setState(1);
-//                                isPlayersOneTurn = false;
-//                                settings.getP1().setActive(false);
-//                                settings.getP2().setActive(true);
-//                            }
-//                        }
-//                        else {
-//                            if (bs.getState() == 0) {
-//                                settings.getBoard().addDot(bs.getRow(), bs.getColumn());
-//                                bs.setState(2);
-//                                isPlayersOneTurn = true;
-//                                settings.getP1().setActive(true);
-//                                settings.getP2().setActive(false);
-//                            }
-//                        }
-//                        repaint();
-//                    }
-//                });
+        if (!Settings.gameSettings.isLoaded()) {
+            board = new BoardSquare[size][size];
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    BoardSquare bs = new BoardSquare(i, j);
+                    board[i][j] = bs;
+                    boardPanel.add(bs);
+                    bs.addMouseListener(new BoardSquareMouseListener(bs, scoreLabel));
+                }
+            }
+            settings.setBoardSquares(board);
+        } else {
+            for (int i = 0; i < size ; i++) {
+                for (int j = 0; j < size ; j++) {
+                    boardPanel.add(Settings.gameSettings.getBoardSquares()[i][j]);
+                }
             }
         }
-        settings.setBoardSquares(board);
         add(boardPanel,BorderLayout.CENTER);
         repaint();
     }
 
+
+
     private void createInfoPanel(){
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(null);
-        infoPanel.setBackground(c1);
+        infoPanel.setBackground(backgroundColor);
         infoPanel.setPreferredSize(new Dimension(300,500));
         add(infoPanel, BorderLayout.EAST);
-
-        Font font = new Font("Arial",Font.BOLD,18);
 
         JLabel playerOneLabel = new JLabel();
         playerOneLabel.setText(settings.getP1().getName());
         playerOneLabel.setFont(font);
         playerOneLabel.setForeground(settings.getP1().getColor());
-        playerOneLabel.setBounds(20,20, 100,20);
+        playerOneLabel.setBounds(20,20, 100,25);
 
         JLabel playerTwoLabel = new JLabel();
         playerTwoLabel.setText(settings.getP2().getName());
         playerTwoLabel.setFont(font);
         playerTwoLabel.setForeground(settings.getP2().getColor());
-        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,20, 100,20);
+        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 120,20, 100,25);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        scoreLabel.setForeground(c2);
-        scoreLabel.setFont(font);
+        scoreLabel.setForeground(foregroundColor);
+        scoreLabel.setFont(settings.getGlobalTheme().getFontLarge());
         scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
         scoreLabel.setBounds(130,20, 60,20);
 
-
         JLabel saveLabel = new JLabel();
-        saveLabel.setForeground(c2);
+        saveLabel.setForeground(foregroundColor);
         saveLabel.setFont(font);
         saveLabel.setText("Save Game");
-        saveLabel.addMouseListener(new MyMouseListener(saveLabel, this));
+        saveLabel.addMouseListener(new NavigateMouseListener(saveLabel, this));
         saveLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         saveLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 160,(int)infoPanel.getPreferredSize().getHeight() - 80, 140,25);
 
@@ -130,7 +110,7 @@ public class BoardFrame extends JFrame {
         resignLabel.setForeground(Color.RED);
         resignLabel.setFont(font);
         resignLabel.setText("Resign");
-        resignLabel.addMouseListener(new MyMouseListener(resignLabel, this));
+        resignLabel.addMouseListener(new NavigateMouseListener(resignLabel, this));
         resignLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         resignLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 160,(int)infoPanel.getPreferredSize().getHeight() - 50, 140,25);
 
@@ -143,8 +123,7 @@ public class BoardFrame extends JFrame {
              System.err.println("The clock icon could not be read");
          }
 
-        Font timerFont = new Font("Arial", Font.ITALIC, 16);
-
+        Font timerFont = new Font("Arial", Font.ITALIC, 15);
 
         playerOneTimerLabel = new JLabel();
         playerOneTimerLabel.setText(timerIntoString(settings.getP1().getRemainingTime()));
@@ -162,7 +141,6 @@ public class BoardFrame extends JFrame {
         playerTwoTimerLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,60, 120,20);
         playerTwoTimerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-
         infoPanel.add(playerOneLabel);
         infoPanel.add(playerTwoLabel);
         infoPanel.add(playerOneTimerLabel);
@@ -174,8 +152,8 @@ public class BoardFrame extends JFrame {
     }
 
     private class ClockListener implements ActionListener {
-        Player p1 = Settings.GAME_SETTINGS.getP1();
-        Player p2 = Settings.GAME_SETTINGS.getP2();
+        Player p1 = Settings.gameSettings.getP1();
+        Player p2 = Settings.gameSettings.getP2();
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -203,39 +181,7 @@ public class BoardFrame extends JFrame {
         int sec = timeInSeconds % 60;
         int min = ((timeInSeconds - sec)/60) % 60;
         int hours = (((timeInSeconds - sec)/60) - min)/60;
-
         return "" + (hours>0 ? hours : 0) + "h : " + min + "m : " + sec + "s";
 
     }
-
-
-//    private void drawBase(Base base){
-//        Cycle cycleToDraw = base.getCycle();
-//        DotNode dotNode = cycleToDraw.getDotNode();
-//        List<Dot> sortedListOfDotsWithinACycle = new ArrayList<>();
-//        sortedListOfDotsWithinACycle.add(dotNode.d);
-//        while (dotNode.next != null){
-//            sortedListOfDotsWithinACycle.add(dotNode.next.d);
-//            dotNode = dotNode.next;
-//        }
-//
-//        Dot d;
-//        Dot previousD;
-//        Dot nextD;
-//        for (int i = 0; i < sortedListOfDotsWithinACycle.size() - 1; i++) {
-//            if (i != 0) previousD = sortedListOfDotsWithinACycle.get(i - 1);
-//            else previousD = sortedListOfDotsWithinACycle.get(sortedListOfDotsWithinACycle.size() - 1);
-//
-//            if (i != sortedListOfDotsWithinACycle.size() - 1) nextD = sortedListOfDotsWithinACycle.get(i +1);
-//            else nextD = sortedListOfDotsWithinACycle.get(0);
-//
-//            d = sortedListOfDotsWithinACycle.get(i);
-//            board[d.getX()][d.getY()].addConnection(previousD);
-//            board[d.getX()][d.getY()].addConnection(nextD);
-//            board[d.getX()][d.getY()].repaint();
-//        }
-//
-//    }
-
-
 }
