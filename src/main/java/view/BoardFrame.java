@@ -9,8 +9,7 @@ import main.java.model.Settings;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +30,24 @@ public class BoardFrame extends JFrame {
         settings = Settings.gameSettings;
         backgroundColor = settings.getGlobalTheme().getBackgroundColor();
         foregroundColor = settings.getGlobalTheme().getForegroundColor();
+        setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         font = settings.getGlobalTheme().getFontLarge();
         scoreLabel = new JLabel();
         setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowIconified(WindowEvent e) {
+                super.windowIconified(e);
+                timer.stop();
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                super.windowDeiconified(e);
+                timer.start();
+            }
+        });
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);

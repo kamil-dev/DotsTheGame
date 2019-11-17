@@ -47,24 +47,25 @@ public class BoardSquare extends JPanel implements Serializable {
         if (row == lastRowAndColIndex) g.drawLine(0,height,width,height);
         if (column == lastRowAndColIndex) g.drawLine(width,0,width,height);
 
-
+        Graphics2D graphics2D = (Graphics2D)g;
+        graphics2D.setStroke(new BasicStroke(2));
         Color c;
         if (state != 0) {
             if (state == 1) c = settings.getP1().getColor(); else c = settings.getP2().getColor();
 
-            g.setColor(c);
-            g.fillOval(width/2-4,height/2-4,8,8);
+            graphics2D.setColor(c);
+            graphics2D.fillOval(width/2-4,height/2-4,8,8);
 
             if (connections != null){
                 for (Dot d : connections){
-                    if (d.getX() < row && d.getY() < column) g.drawLine(0,0,width/2,height/2); //ok
-                    if (d.getX() < row && d.getY() == column) g.drawLine(width/2,0,width/2,height/2);
-                    if (d.getX() < row && d.getY() > column) g.drawLine(width,0,width/2,height/2);
-                    if (d.getX() == row && d.getY() > column) g.drawLine(width,height/2,width/2,height/2);
-                    if (d.getX() > row && d.getY() > column) g.drawLine(width,height,width/2,height/2); //ok
-                    if (d.getX() > row && d.getY() == column) g.drawLine(width/2,height,width/2,height/2);
-                    if (d.getX() > row && d.getY() < column) g.drawLine(0,height,width/2,height/2);
-                    if (d.getX() == row && d.getY() < column) g.drawLine(0,height/2,width/2,height/2);
+                    if (d.getX() < row && d.getY() < column) graphics2D.drawLine(0,0,width/2,height/2); //ok
+                    if (d.getX() < row && d.getY() == column) graphics2D.drawLine(width/2,0,width/2,height/2);
+                    if (d.getX() < row && d.getY() > column) graphics2D.drawLine(width,0,width/2,height/2);
+                    if (d.getX() == row && d.getY() > column) graphics2D.drawLine(width,height/2,width/2,height/2);
+                    if (d.getX() > row && d.getY() > column) graphics2D.drawLine(width,height,width/2,height/2); //ok
+                    if (d.getX() > row && d.getY() == column) graphics2D.drawLine(width/2,height,width/2,height/2);
+                    if (d.getX() > row && d.getY() < column) graphics2D.drawLine(0,height,width/2,height/2);
+                    if (d.getX() == row && d.getY() < column) graphics2D.drawLine(0,height/2,width/2,height/2);
                 }
             }
         }

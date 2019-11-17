@@ -3,14 +3,20 @@ package main.java.view;
 import main.java.controller.NavigateMouseListener;
 import main.java.model.Settings;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class SettingsFrame extends JFrame {
     private int width = 500;
     private int height = 525;
-    private Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.WHITE, Color.BLACK};
-    private JTextField timerTextField, boardSizeTextField, playerOneNameTextField, playerTwoNameTextField;
+    private Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.WHITE, Color.BLACK, Color.CYAN};
+    private JTextField boardSizeTextField, playerOneNameTextField, playerTwoNameTextField;
+    private JSpinner hoursSpinner, minutesSpinner, secondsSpinner;
     private JComboBox<Color> playerOneComboBox, playerTwoComboBox;
     private Color backgroundColor, foregroundColor;
     private Font fontLarge, fontNormal;
@@ -19,6 +25,7 @@ public class SettingsFrame extends JFrame {
         setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         setVisible(true);
         setResizable(false);
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
@@ -35,13 +42,23 @@ public class SettingsFrame extends JFrame {
 
         settingsPanel.setBackground(backgroundColor);
 
+        try {
+            BufferedImage gameNameIcon = ImageIO.read(new File("src\\main\\resources\\picturetopeople.org-d3b02807efef49a5e8992c90051993385db6615ff94978b17a.png"));
+            JLabel gameNameLabel = new JLabel(new ImageIcon(gameNameIcon.getScaledInstance(140,60,Image.SCALE_SMOOTH)));
+            gameNameLabel.setBounds((width - 140)/2, 20, 140,60);
+            settingsPanel.add(gameNameLabel);
+        } catch (IOException e) {
+            System.err.println("The game name icon could not be read");
+        }
+
+
         JLabel playerOneLabel = new JLabel("Player 1");
-        playerOneLabel.setBounds(50,20, 100,20);
+        playerOneLabel.setBounds(50,120, 100,20);
         playerOneLabel.setFont(fontLarge);
         playerOneLabel.setForeground(foregroundColor);
 
         JLabel playerTwoLabel = new JLabel("Player 2");
-        playerTwoLabel.setBounds( width - 150,20, 100,20);
+        playerTwoLabel.setBounds( width - 150,120, 100,20);
         playerTwoLabel.setFont(fontLarge);
         playerTwoLabel.setForeground(foregroundColor);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -49,27 +66,27 @@ public class SettingsFrame extends JFrame {
         JLabel nameLabel = new JLabel("name");
         nameLabel.setForeground(foregroundColor);
         nameLabel.setFont(fontNormal);
-        nameLabel.setBounds(width - 300, 60, 100, 20);
+        nameLabel.setBounds(width - 300, 160, 100, 20);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         playerOneNameTextField = new JTextField();
-        playerOneNameTextField.setBounds(50,60,100,20);
+        playerOneNameTextField.setBounds(50,160,100,20);
 
         playerTwoNameTextField = new JTextField();
-        playerTwoNameTextField.setBounds(width - 150,60,100,20);
+        playerTwoNameTextField.setBounds(width - 150,160,100,20);
 
         JLabel colorLabel = new JLabel("color");
         colorLabel.setForeground(foregroundColor);
         colorLabel.setFont(fontNormal);
-        colorLabel.setBounds(width - 300, 100, 100, 20);
+        colorLabel.setBounds(width - 300, 200, 100, 20);
         colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         playerOneComboBox = new JComboBox<>(colors);
-        playerOneComboBox.setBounds(50,100,100,20);
+        playerOneComboBox.setBounds(50,200,100,20);
         playerOneComboBox.setSelectedIndex(0);
 
         playerTwoComboBox = new JComboBox<>(colors);
-        playerTwoComboBox.setBounds(width - 150,100,100,20);
+        playerTwoComboBox.setBounds(width - 150,200,100,20);
         playerTwoComboBox.setSelectedIndex(1);
 
         ComboBoxRenderer renderer = new ComboBoxRenderer();
@@ -84,15 +101,26 @@ public class SettingsFrame extends JFrame {
 
         boardSizeTextField = new JTextField();
         boardSizeTextField.setBounds(160,height - 140,50,20);
+        boardSizeTextField.setToolTipText("Type in an integer between 10 and 40");
 
-        JLabel timerLabel = new JLabel("Timer (s):");
+        JLabel timerLabel = new JLabel("Timer (h.m.s):");
         timerLabel.setForeground(foregroundColor);
         timerLabel.setFont(fontNormal);
         timerLabel.setBounds(50,height - 100,100,20);
 
-        timerTextField = new JTextField();
-        timerTextField.setBounds(160,height - 100,50,20);
+//        timerTextField = new JTextField();
+//        timerTextField.setBounds(160,height - 100,50,20);
+//        timerTextField.setToolTipText("T");
 
+        hoursSpinner = new JSpinner(new SpinnerNumberModel(0,0,10,1));
+        hoursSpinner.setToolTipText("Hours");
+        hoursSpinner.setBounds(160,height-100, 35,20);
+        minutesSpinner = new JSpinner(new SpinnerNumberModel(30,0,59,1));
+        minutesSpinner.setToolTipText("Minutes");
+        minutesSpinner.setBounds(205,height-100, 35,20);
+        secondsSpinner = new JSpinner(new SpinnerNumberModel(0,0,59,1));
+        secondsSpinner.setToolTipText("Seconds");
+        secondsSpinner.setBounds(250,height-100, 35,20);
 
         JLabel acceptLabel = new JLabel("Accept");
         acceptLabel.setForeground(foregroundColor);
@@ -120,7 +148,9 @@ public class SettingsFrame extends JFrame {
         settingsPanel.add(boardSizeLabel);
         settingsPanel.add(boardSizeTextField);
         settingsPanel.add(timerLabel);
-        settingsPanel.add(timerTextField);
+        settingsPanel.add(hoursSpinner);
+        settingsPanel.add(minutesSpinner);
+        settingsPanel.add(secondsSpinner);
         settingsPanel.add(acceptLabel);
         settingsPanel.add(cancelLabel);
 
@@ -152,7 +182,8 @@ public class SettingsFrame extends JFrame {
 
     public Integer getTimer() {
         try {
-            return Integer.parseInt(timerTextField.getText());
+            int timer = (int)hoursSpinner.getValue() * 3600 + (int)minutesSpinner.getValue() * 60 + (int)secondsSpinner.getValue();
+            return timer;
         } catch (NumberFormatException e) {
             return null;
         }

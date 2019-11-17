@@ -23,6 +23,7 @@ public class EndFrame extends JFrame {
         font = new Font("Arial",Font.BOLD,16);
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
+        setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         setSize(width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

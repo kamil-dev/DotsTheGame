@@ -15,9 +15,10 @@ public class SaveGameFrame extends JFrame {
     public SaveGameFrame(){
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
+        setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         font = Settings.gameSettings.getGlobalTheme().getFontLarge();
         setSize(width,height);
-        setLocation(300,300);
+        setLocation(300,200);
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);

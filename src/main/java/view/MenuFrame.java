@@ -25,6 +25,7 @@ public class MenuFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
+        setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
         font = Settings.gameSettings.getGlobalTheme().getFontLarge();

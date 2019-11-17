@@ -30,7 +30,7 @@ public class NavigateMouseListener implements MouseListener {
             SettingsFrame settingsFrame = new SettingsFrame();
         } else if (labelText.equals("Load Game")){
             frame.setVisible(false);
-            LoadGameFrame settingsFrame = new LoadGameFrame();
+            LoadGameFrame loadgameFrame = new LoadGameFrame();
         } else if (labelText.equals("Cancel")){
             frame.setVisible(false);
             MenuFrame menuFrame = new MenuFrame();

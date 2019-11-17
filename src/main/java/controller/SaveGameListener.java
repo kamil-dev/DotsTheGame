@@ -36,7 +36,7 @@ public class SaveGameListener extends AbstractAction {
             }
             saveFrame.setVisible(false);
         } else {
-            textField.setText("Incorrect file name - use wordly chars only");
+            textField.setText("wordly chars only!");
         }
 
     }
