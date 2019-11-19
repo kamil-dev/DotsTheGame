@@ -4,12 +4,6 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
-/*
-    ==========================
-     CLASS IN CONSTRUCTION!!!!!
-    ==========================
- */
-
 public class Base implements ICycle{
     private int ownerId;
     private Cycle cycle;

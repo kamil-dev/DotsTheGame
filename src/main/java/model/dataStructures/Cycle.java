@@ -7,13 +7,7 @@ import main.java.model.Board;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
-    ==========================
-     CLASS IN CONSTRUCTION!!!!!
-    ==========================
- */
-
-public class Cycle implements main.java.model.dataStructures.ICycle {
+public class Cycle implements ICycle {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;
@@ -47,7 +41,7 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
             addDotToCycleAsHead(dot);
         }
     }
- 
+
     private DotNode addDotToCycleAsHead(Dot dot){
         this.dotNode = new DotNode(dot, this.dotNode);
         dotsSet.add(dot);
@@ -147,11 +141,14 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         return false;
     }
 
+
+
     public boolean doesContainACycle(Cycle c){
-        if(    c.getYmax()<= this.getYmax() && c.getYmin() >= this.getYmin()
-                && c.getXmax()<= this.getXmax() && c.getXmin() >= this.getXmin() )
-            return true;
-        return false;
+        for(Dot d : c.getDotsSet()){
+            if (this.hasOutside(d))
+                return false;
+        }
+        return true;
     }
 
     public boolean contains(Dot d){
