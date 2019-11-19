@@ -16,6 +16,7 @@ public class SettingsErrorFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
+        setTitle("ERROR");
         this.createPanel();
 
     }

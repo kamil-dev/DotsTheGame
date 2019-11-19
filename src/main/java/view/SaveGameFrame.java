@@ -22,6 +22,7 @@ public class SaveGameFrame extends JFrame {
         setLayout(new BorderLayout());
         setVisible(true);
         setResizable(false);
+        setTitle("SAVE GAME");
         createPanel();
     }
 

@@ -31,6 +31,7 @@ public class EndFrame extends JFrame {
         setResizable(false);
         this.winner = winner;
         this.cause = cause;
+        setTitle("END OF GAME");
         createPanel();
     }
 

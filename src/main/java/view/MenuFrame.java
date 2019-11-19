@@ -29,6 +29,7 @@ public class MenuFrame extends JFrame {
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
         font = Settings.gameSettings.getGlobalTheme().getFontLarge();
+        setTitle("MENU");
         createPanel();
     }
 

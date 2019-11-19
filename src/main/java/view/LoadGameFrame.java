@@ -23,6 +23,7 @@ public class LoadGameFrame extends JFrame {
         setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());
         setVisible(true);
         setResizable(false);
+        setTitle("LOAD GAME");
         createFileChooser();
     }
 

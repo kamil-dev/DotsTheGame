@@ -32,6 +32,7 @@ public class SettingsFrame extends JFrame {
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
         fontLarge = Settings.gameSettings.getGlobalTheme().getFontLarge();
         fontNormal = Settings.gameSettings.getGlobalTheme().getFontNormal();
+        setTitle("SETTINGS");
         createPanel();
     }
 
