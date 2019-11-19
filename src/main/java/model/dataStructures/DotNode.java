@@ -2,9 +2,7 @@
  Author: Marcin Bartosiak */
 package main.java.model.dataStructures;
 
-import java.io.Serializable;
-
-public class DotNode implements Serializable {
+public class DotNode {
     public Dot d;
     public DotNode next;
 
@@ -20,18 +18,35 @@ public class DotNode implements Serializable {
         DotNode dn2 = (DotNode) obj;
         if (dn2 == null)
             return false;
-        if( this.d.equals(dn2.d)){
-            if (this.next == null)
-            {
-                if (dn2.next == null)
-                    return true;
-                return false;
-            }
-            if(dn2.next == null)
-                return false;
-            return this.next.d.equals(dn2.next.d);
-        }
-        return false;
+        return this.d.equals(dn2.d);
+//        if( this.d.equals(dn2.d)){
+//            if (this.next == null)
+//            {
+//                if (dn2.next == null)
+//                    return true;
+//                return false;
+//            }
+//            if(dn2.next == null)
+//                return false;
+//            return this.next.d.equals(dn2.next.d);
+//        }
+//        return false;
     }
 
+    public int getY(){
+        return d.getY();
+    }
+    public int getX(){
+        return d.getX();
+    }
+
+    @Override
+    public int hashCode() {
+        return d.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "(" + d.getX() + ", " + d.getY() + ") ";
+    }
 }

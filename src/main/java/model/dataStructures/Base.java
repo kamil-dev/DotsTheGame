@@ -4,15 +4,13 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
-import java.io.Serializable;
-
 /*
     ==========================
      CLASS IN CONSTRUCTION!!!!!
     ==========================
  */
 
-public class Base implements ICycle, Serializable {
+public class Base implements ICycle{
     private int ownerId;
     private Cycle cycle;
     private Board board;
@@ -23,6 +21,10 @@ public class Base implements ICycle, Serializable {
         this.board = b;
         this.ownerId = ownerId;
         this.pointsCount = countPoints();
+    }
+
+    public DotNode getNext(DotNode dn){
+        return cycle.getNext(dn);
     }
 
     @Override

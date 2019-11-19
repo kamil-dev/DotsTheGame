@@ -4,7 +4,6 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,16 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
     ==========================
  */
 
-public class Cycle implements main.java.model.dataStructures.ICycle, Serializable {
+public class Cycle implements main.java.model.dataStructures.ICycle {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;
     private int xmax = 0;
     private int ymin = Integer.MAX_VALUE;
     private int ymax = 0;
-    private HashMap<Integer,LinkedList<DotNode>> dotsHorrizontally  // integer is an x position of a dot,
-            = new HashMap<>();                          // list contains dots on the cycle with that x position.
-                                                        // does not contain the lists for xmin and xmax
+
     private HashSet<Dot> dotsSet = new HashSet<>();
     private DotNode dotNode;                            // last dotNode.next == null to mark the end of cycle
 
@@ -33,8 +30,6 @@ public class Cycle implements main.java.model.dataStructures.ICycle, Serializabl
     public Cycle(Board board, int ownerId, Dot[] path, AtomicInteger pathIndex){
         this.board = board;
         this.ownerId = ownerId;
-        DotNode next = null;
-        DotNode dotNode = null;
         while (pathIndex.get() > 0){
             pathIndex.set(pathIndex.get() -1);
             Dot dot = path[pathIndex.get()];
@@ -49,53 +44,87 @@ public class Cycle implements main.java.model.dataStructures.ICycle, Serializabl
             if( y > ymax)
                 ymax = y;
 
-            dotsSet.add(dot);
-            dotNode = new DotNode(dot,next);
-            next = dotNode;
-            if(dotsHorrizontally.get(x) == null)
-                dotsHorrizontally.put(x, new LinkedList<>());
-            dotsHorrizontally.get(x).add(dotNode);
+            addDotToCycleAsHead(dot);
         }
-        this.dotNode = dotNode;
     }
+
+    private DotNode addDotToCycleAsHead(Dot dot){
+        this.dotNode = new DotNode(dot, this.dotNode);
+        dotsSet.add(dot);
+        return this.dotNode;
+    }
+
+    private DotNode addDotToCyclesDataStructures(Dot d){
+        DotNode dncNew = new DotNode(d, null);
+        dotsSet.add(d);
+        return dncNew;
+    }
+
+    private DotNode addDotToCyclesDataStructures(Dot d, DotNode next){
+        DotNode dncNew = addDotToCyclesDataStructures(d);
+        dncNew.next = next;
+        return dncNew;
+    }
+
+    private DotNode addDotToCyclesDataStructures(DotNode prev, Dot d){
+        DotNode dncNew = addDotToCyclesDataStructures(d);
+        prev.next = dncNew;
+        return dncNew;
+    }
+
 
     // assumption of order guarantee:
     //      we have a guarantee that toDot is next from fromDot in Board::extendCycle
     public void replacePath(DotNode firstDn, Dot[] path, int pathIndex)
     {
         Dot toDot =  path[--pathIndex];
-        DotNode toDotDn = firstDn.next;
-        while (!toDotDn.d.equals(toDot)){     // delete old dots   // potencjalnie tu może zawisnac przy zlej implementacji
-            toDotDn = removeDotNodeFromCyclesDataStructures(toDotDn);
-        }
-        // dn contains toDot now
+        System.out.println("replace path TO DOT:" + toDot.getX() +"," + toDot.getY());
+
+        DotNode toDotDn = deleteOldPath(firstDn, toDot);
+
+        DotNode dn = firstDn;
         for (int i = 1 ; i< pathIndex ; i++){          // add new dots to cycle // path[0] is a fromDot
-            firstDn.next = addDotToCyclesDataStructures(path[i]);
-            firstDn = firstDn.next;
+            Dot d = path[i];
+            dn = dn.next = new DotNode(d,null);
+            dotsSet.add(d);
         }
-        firstDn.next = toDotDn;
+        dn.next = toDotDn;
+
+        System.out.println("cycle after replace path");
+        printCycle();
+        this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
     }
 
-    public void recomputeMinAnsMaxCoordinates()
+    public void recomputeMinAndMaxCoordinatesAndResetDotsSet()
     {
         int xmin = Integer.MAX_VALUE;
         int xmax = 0;
         int ymin = Integer.MAX_VALUE;
         int ymax = 0;
-        for (Dot d : this.getDotsSet()) {
-            if(d.getX()>xmax)
+        this.dotsSet = new HashSet<>();
+        DotNode dn = this.dotNode;
+        while (dn!=null ){
+            Dot d = dn.d;
+            dotsSet.add(d);
+            if(d.getX() > xmax)
                 xmax = d.getX();
-            if(d.getX()<xmin)
+            if(d.getX() < xmin)
                 xmin = d.getX();
             if(d.getY() > ymax)
                 ymax = d.getY();
             if(d.getY() < ymin)
                 ymin = d.getY();
+            dn = dn.next;
         }
+
         this.xmax = xmax;
         this.xmin = xmin;
         this.ymax = ymax;
         this.ymin = ymin;
+    }
+
+    public DotNode getNext(DotNode dn){
+        return dn.next!=null ? dn.next : this.getDotNode();
     }
 
     public boolean doesOverlapWithCycleOrDoesContainIt(Cycle c) {
@@ -134,109 +163,175 @@ public class Cycle implements main.java.model.dataStructures.ICycle, Serializabl
     // with an exception:
     // when (d.getX()== xmin || d.getX()== xmax) dot is never inside a circle
     public boolean hasInside(Dot d) {
-        int x = d.getX();                       //
-        int y = d.getY();
-        if(x <=xmin || x>= xmax)                //
+        if (dotsSet.contains( d))
             return false;
-        int outerDotsCount = 0;                 //
-        DotNode prevDotNode = dotsHorrizontally.get(x).get(0);
-        if (prevDotNode.d.getY() < y)
-            outerDotsCount++;
-        for (int i = 1; i< dotsHorrizontally.get(x).size(); i++){
-            DotNode dn = dotsHorrizontally.get(x).get(i);
-            if (dn.next != prevDotNode && prevDotNode.next != dn  // situation of crosscutting line alignment with the wall
-                    && dn.d.getY() < y)
-                outerDotsCount++;
-            prevDotNode = dn;
+        int x = d.getX();
+        int y = d.getY();
+
+        boolean northDn = false;
+        boolean southDn = false;
+        boolean eastDn = false;
+        boolean westDn = false;
+
+
+        DotNode dn = this.dotNode;
+
+        while (dn != null){
+            if (dn.getX() == x)
+            {
+                if(dn.getY() < y)
+                    westDn = true;
+                else
+                    eastDn = true;
+            }
+            if(dn.getY() == y){
+                if(dn.getX() < x)
+                    northDn = true;
+                else
+                    southDn = true;
+            }
+            dn = dn.next;
         }
-        return (outerDotsCount%2) == 1;
+        return northDn && eastDn && westDn && southDn;
+
+//        int x = d.getX();
+//
+//        LinkedList<DotNode> dnsOnX = dotsHorrizontally.get(x);
+//        if(dnsOnX == null || dnsOnX.size() == 0)
+//            return false;
+//
+//        DotNode dn, prevDn, nextOnList;
+//        dn = dnsOnX.get(0);
+//        prevDn = this.dotNode;
+//        while (prevDn.next != null && dn != prevDn.next ){
+//            prevDn = prevDn.next;
+//        }
+//
+//        int borderCrossCount = 0;
+//        int i = 1;
+//        while (i< dnsOnX.size()){
+//            while (i< dnsOnX.size() -1 && x == (nextOnList = dnsOnX.get(i+1)).getX() && areNeighbours(nextOnList, dn) ) {
+//                dn = nextOnList;
+//                i++;
+//            }
+//            if(areOpposite(prevDn,dn))
+//                borderCrossCount++;
+//
+//            prevDn = dn;
+//            dn = dnsOnX.get(i++);
+//        }
+//
+//        return (borderCrossCount%2) == 1;
     }
+
+//    private boolean areNeighbours(DotNode dn1, DotNode dn2){
+//        return dn1.next == dn2 || dn2.next == dn1;
+//    }
+//
+//    private boolean areOpposite(DotNode prevDn, DotNode dn){
+//        DotNode nextDn = dn.next!= null ? dn.next : this.dotNode;
+//        return ( prevDn.getX() < dn.getX() && dn.getX() < nextDn.getX() )
+//                ||
+//                (prevDn.getX() > dn.getX() && dn.getX() > nextDn.getX());
+//    }
+//    //private boolean didCross()
 
     public boolean hasOutside(Dot d) {
-        return !dotsSet.contains(d) && ! hasInside(d);
-    }
-
-    private DotNode addDotToCyclesDataStructures(Dot d){
-        DotNode dncNew = new DotNode(d, null);
-        dotsSet.add(d);
-        int x = d.getX();
-        if (!dotsHorrizontally.keySet().contains(x))
-            dotsHorrizontally.put(x, new LinkedList<>());
-        dotsHorrizontally.get(x).add(dncNew);
-        return dncNew;
+        return !dotsSet.contains(d) && !hasInside(d);
     }
 
     // returns next DotNode
     private DotNode removeDotNodeFromCyclesDataStructures(DotNode dotNode){
         Dot d = dotNode.d;
-        int x = d.getX();
-        System.out.println("delete successful: "+dotsHorrizontally.get(x).remove(dotNode));
-        System.out.println("dot delete successful: " + dotsSet.remove(d));
+        System.out.println("dot "+d.getX()+','+d.getY()+"dot delete successful: " + dotsSet.remove(d));
         return dotNode.next;
     }
 
     //including DotNode excluding Dot
-    private DotNode removePathFromDotNodeToDot(DotNode fromDnc, Dot toDot){
+    private DotNode removePathFromDotNodeUntilDot(DotNode fromDnc, Dot toDot){
         while (!fromDnc.d.equals(toDot)) {     // remove old path dots from cycle  //
             removeDotNodeFromCyclesDataStructures(fromDnc);
             System.out.println("ttuu");
-            fromDnc = fromDnc.next!=null ? fromDnc.next : this.dotNode;
+            if(fromDnc.next == null)
+                return fromDnc;
+            fromDnc = fromDnc.next;
         }
-        removeDotNodeFromCyclesDataStructures(fromDnc);
-        fromDnc = fromDnc.next;
         return fromDnc;
     }
 
     public void cutBase(DotNode firstDnc, Base base){
-        Dot firstDot = firstDnc.d;
-        List<DotNode> dnbsOnFirstDncX = base.getCycle().dotsHorrizontally.get(firstDot.getX());
-        Iterator<DotNode> itr = dnbsOnFirstDncX.iterator();
-        DotNode firstDnb = itr.next();
-        while (!firstDnb.d.equals(firstDot))
-            firstDnb = itr.next();
-        DotNode firstDnbNext = firstDnb.next!=null ?  firstDnb.next : base.getDotNode();
-        DotNode firstDncNext = firstDnc.next!=null ?  firstDnc.next : this.getDotNode();
+        DotNode firstDnb = base.getDotNode();
+        while (!firstDnb.equals(firstDnc))
+            firstDnb = base.getNext(firstDnb);
 
-        DotNode dnc = firstDnc;
-        if (firstDnbNext.d != firstDncNext.d) {     // base cycle goes in an opposite direction - cool
-            DotNode dnbNewPath = firstDnbNext;
-            while (!this.contains(dnbNewPath.d)) {     // add new path dots to cycle   // potencjalnie tu może zawisnac przy zlej implementacji
-                dnc.next = addDotToCyclesDataStructures(dnbNewPath.d);
-                dnc = dnc.next;
-                dnbNewPath = dnbNewPath.next!=null ? dnbNewPath.next : base.getDotNode();
-            }
-            // dnbNewPath contains the first dot on alternative path contained both by base and cycle
-            dnc.next = removePathFromDotNodeToDot(firstDncNext,dnbNewPath.d);    // remove old path dots from cycle  //
+        DotNode lastDncOnBase = firstDnc;
+        DotNode dn = firstDnc;
+        while ( dn != null ){
+            if(base.contains(dn.d))
+                lastDncOnBase = dn;
+            dn = dn.next;
         }
-        else {      // base cycle goes in the same direction as cycle
-            DotNode[] path = new DotNode[dotsSet.size() + base.getCycle().dotsSet.size()];
-            int index = -1;
-            DotNode lastDnbOnCycle = firstDnc;
-            DotNode dnbOldPath = firstDnbNext;
-            while (dnbOldPath.d != firstDnc.d){
-                path[++index] = dnbOldPath;
-                if(this.contains(dnbOldPath.d))
-                    lastDnbOnCycle = dnbOldPath;
-                dnbOldPath = dnbOldPath.next!=null ? dnbOldPath.next : base.getDotNode();
+
+        deleteOldPath(firstDnc,lastDncOnBase);
+
+        DotNode firstDnbNext = base.getNext(firstDnb);
+        DotNode firstDncNext =  firstDnc.next ; // firstDnc.next musi istniec w przeciwnym wypadku bledne wywolanie
+
+        if (firstDnbNext.d != firstDncNext.d) {     // base cycle goes in an opposite direction - cool
+            DotNode dnb = firstDnbNext;
+            while (!dnb.equals(lastDncOnBase)){
+                dnb = base.getNext(dnb);
             }
-            Dot lastDot = lastDnbOnCycle.d;
-            while ( index >=0 && !path[index].d.equals(lastDot)){       // add new path to cycle
-                DotNode dncToAdd = addDotToCyclesDataStructures(path[index--].d);
-                dnc.next = dncToAdd;
-                dnc = dncToAdd;
-            }
-            // find last dnc on base
-            DotNode lastDncOnBase = firstDncNext;
-            while (!lastDncOnBase.d.equals(lastDot)) {
-                lastDncOnBase = lastDncOnBase.next;
-            }
-            dnc.next = lastDncOnBase;
-            while (index >= 0)        // remove old dots from cycle
-                removeDotNodeFromCyclesDataStructures(path[index--]);
+            DotNode lastDnbOnCycle = dnb;
+
+            addNewPathReverse(lastDncOnBase, lastDnbOnCycle, firstDnc, base);
+        }
+        else {
+            addNewPath(firstDnc,firstDnbNext,lastDncOnBase,base);
+        }
+
+        this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
+    }
+
+    private void deleteOldPath(DotNode fDnc, DotNode lDnc){
+        DotNode dn = fDnc;
+        while (dn.next != lDnc){
+            dn = dn.next;
+            dotsSet.remove(dn.d);
+        }
+    }
+    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc){
+        DotNode dn = fDnc;
+        while (dn.next.d != lDotnc){
+            dn = dn.next;
+            dotsSet.remove(dn.d);
+        }
+        return dn.next;
+    }
+
+    private void addNewPath(DotNode fDnc, DotNode fDnbNext, DotNode lDnc, Base base){
+        DotNode dnc = fDnc;
+        DotNode dnb = fDnbNext;
+        while ( ! dnb.equals(lDnc)){
+            dnc = dnc.next = new DotNode(dnb.d,null);
+            dotsSet.add(dnb.d);
+            dnb = base.getNext(dnb);
+        }
+        dnc.next = lDnc;
+    }
+
+    private void addNewPathReverse(DotNode lDnc, DotNode lDnb, DotNode fDnc, Base base){
+        DotNode dnc = lDnc;
+        DotNode dnb = base.getNext(lDnb);
+        while ( !dnb.equals(fDnc)){
+            Dot d = dnb.d;
+            dotsSet.add(d);
+            dnb = base.getNext(dnb);
         }
     }
 
     public void printCycle(){
+        System.out.println(""+this.getXmin()+"-" + this.getXmax() + ", " + this.getYmin()+ "-"+ this.getYmax());
         DotNode dn = this.dotNode;
         System.out.println("cycle:");
         do{
