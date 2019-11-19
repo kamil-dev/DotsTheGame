@@ -9,17 +9,19 @@ public class Player {
     private Color color;
     private int remainingTime;
     private int points;
+    private boolean isActive;
 
     public Player(int id, Color color, int remainingTime) {
-        this(id,color,remainingTime, String.valueOf(id));
+        this(id,color,remainingTime, String.valueOf(id), false);
     }
 
-    public Player(int id, Color color, int remainingTime, String name) {
+    public Player(int id, Color color, int remainingTime, String name, boolean isActive) {
         this.id = id;
         this.color = color;
         this.remainingTime = remainingTime;
         this.points = 0;
         this.name = name;
+        this.isActive = isActive;
     }
 
     public int getId() {return this.id;}
@@ -56,6 +58,18 @@ public class Player {
     @Override
     public int hashCode() {
         return Objects.hash(color, remainingTime);
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
     }
 
 

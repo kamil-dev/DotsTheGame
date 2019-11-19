@@ -23,6 +23,10 @@ public class Base implements ICycle{
         this.pointsCount = countPoints();
     }
 
+    public DotNode getNext(DotNode dn){
+        return cycle.getNext(dn);
+    }
+
     @Override
     public boolean contains(Dot d) {
         return cycle.contains(d);
