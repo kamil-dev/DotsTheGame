@@ -36,6 +36,10 @@ public class Base implements ICycle{
         return cycle.hasOutside(d);
     }
 
+    public boolean doesContainACycle(Cycle cycle){
+        return this.getCycle().doesContainACycle(cycle);
+    }
+
     private int countPoints(){
         int pointsCount = 0;
         for(int i = this.cycle.getXmin(); i<=this.cycle.getXmax(); i++)

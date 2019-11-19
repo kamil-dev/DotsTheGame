@@ -10,24 +10,28 @@ public class Board {
     private Dot[][] matrixOfDots;
     private int size;
     private int dotNb = 1;
-    private int freeDotSpacesCount;
+    Set<Dot> freeDotSpaces = new HashSet<>();
 
     private int activePlayer = 0; //  opposing player nb is: 1 - activePlayer
-    private int pointsPlayer0 = 0;
-    private int pointsPlayer1 = 0;
+    private int[] pointsPlayer = new int[2];
 
     private Set<Cycle>[] cyclesOfPlayers = new Set[2];
-    private Set<Base>[] basesOfPlayer = new Set[2];
+    private Set<Base>[] basesOfPlayers = new Set[2];
 
 
     public Board(int size) {
         this.matrixOfDots = new Dot[size][size];
         this.cyclesOfPlayers[0] = new HashSet<>();
         this.cyclesOfPlayers[1] = new HashSet<>();
-        this.basesOfPlayer[0] = new HashSet<>();
-        this.basesOfPlayer[1] = new HashSet<>();
+        this.basesOfPlayers[0] = new HashSet<>();
+        this.basesOfPlayers[1] = new HashSet<>();
         this.size = size;
-        this.freeDotSpacesCount = size * size;
+        for(int i = 0; i<size ; i++){
+            for(int j = 0; j<size; j++){
+                freeDotSpaces.add(new Dot(i,j,-1));
+            }
+        }
+        //this.freeDotSpacesCount = size * size;
         this.activePlayer = 0;
     }
 
@@ -39,6 +43,7 @@ public class Board {
         if(!isPlacingADotPossible(d))
             return;
         matrixOfDots[d.getX()][d.getY()] = d;
+        this.freeDotSpaces.remove(d);
         this.dotNb++;
         boolean baseCreated = false;
         Cycle newCycle = aNewCycleCreatedByDot(d);
@@ -53,7 +58,7 @@ public class Board {
                 replaceOldCyclesWithANewOne(newCycle, activePlayer);
                 if (isBase(newCycle, d, activePlayer)) {
                     Base base = createBase(newCycle, activePlayer);
-                    basesOfPlayer[activePlayer].add(base);
+                    basesOfPlayers[activePlayer].add(base);
                     drawBase(base);
                     baseCreated = true;
                 }
@@ -65,7 +70,7 @@ public class Board {
                         replaceOldCyclesWithANewOne(newCycle, activePlayer);
                         if (isBase(newCycle, d, activePlayer)) {
                             Base base = createBase(newCycle, activePlayer);
-                            basesOfPlayer[activePlayer].add(base);
+                            basesOfPlayers[activePlayer].add(base);
                             drawBase(base);
                             baseCreated = true;
                         }
@@ -78,9 +83,12 @@ public class Board {
         ) {
             Base base = createBase(newCycle, 1 - activePlayer);
             drawBase(base);
+            baseCreated = true;
         }
-        if(baseCreated)
-            updatePoints(activePlayer);
+        if(baseCreated) {
+            updatePoints();
+            System.out.println("Current score:" + this.pointsPlayer[0]+ "-" + this.pointsPlayer[1]);
+        }
         this.activePlayer = 1 - this.activePlayer;
     }
 
@@ -120,17 +128,18 @@ public class Board {
     private Cycle aNewCycleCreatedByDot(Dot addedDot){
         int x = addedDot.getX();
         int y = addedDot.getY();
+        int ownerId = addedDot.getOwnerId();
         Dot[] path = new Dot[(dotNb+1)/2+8];
         AtomicInteger pathIndex = new AtomicInteger(0);
         HashSet<Dot> visited = new HashSet<>();
-        if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited)){ // find path from addedDot to addedDot i.e. a cycle
+        if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, ownerId)){ // find path from addedDot to addedDot i.e. a cycle
             System.out.println("cycle found!");
             for (int i = 0; i< pathIndex.get(); i++){
                 Dot ddd = path[i];
                 System.out.println(""+ddd.getX() +", " + ddd.getY());
             }
             System.out.println("end of cycle");
-            return new Cycle(this, activePlayer, path, pathIndex);
+            return new Cycle(this, ownerId, path, pathIndex);
         }
         return null;
     }
@@ -138,18 +147,19 @@ public class Board {
     private Cycle aSecondCycleCreatedByDot(Dot addedDot, Cycle firstCycle){
         int x = addedDot.getX();
         int y = addedDot.getY();
+        int ownerId = addedDot.getOwnerId();
         Dot[] path = new Dot[(dotNb+3)/2];
         AtomicInteger pathIndex = new AtomicInteger(0);
         HashSet<Dot> visited = new HashSet<>();
         visited.addAll(firstCycle.getDotsSet());
         visited.remove(addedDot);
-        if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited)){  // find path from addedDot to addedDot i.e. a cycle
+        if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, ownerId)){  // find path from addedDot to addedDot i.e. a cycle
             System.out.println("second cycle found!");
             for (int i = 0; i< pathIndex.get(); i++){
                 Dot ddd = path[i];
                 System.out.println(""+ddd.getX() +", " + ddd.getY());
             }
-            return new Cycle(this, activePlayer, path,pathIndex);
+            return new Cycle(this, ownerId, path,pathIndex);
         }
         return null;
     }
@@ -159,7 +169,8 @@ public class Board {
        where path[0] is a starting dot
        path[pathIndex.get()-1] is the last dot on path (to Dot)
      */
-    private boolean findCyclePath(Dot currentDot, Dot toDot, int xmin, int xmax, int ymin, int ymax, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean findCyclePath(Dot currentDot, Dot toDot, int xmin, int xmax, int ymin, int ymax,
+                                  Dot[] path, AtomicInteger pathIndex, Set<Dot> visited, int ownerId){
         //System.out.println(" " +currentDot.getX() +" " + currentDot.getY());
 
         if ( currentDot.equals(toDot)) {
@@ -175,7 +186,7 @@ public class Board {
         path[pathIndex.get()] = currentDot;
         pathIndex.set(pathIndex.get() + 1);
 
-        if(applyFindCyclePathToNeighboringDots(currentDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited))
+        if(applyFindCyclePathToNeighboringDots(currentDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited, ownerId))
             return true;
 
         // if path to toDot through currentDot (considering previous Dots on path) does not exist
@@ -185,7 +196,8 @@ public class Board {
         return false;
     }
 
-    private boolean applyFindCyclePathToNeighboringDots(Dot currentDot, Dot toDot, int xmin, int xmax, int ymin, int ymax, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean applyFindCyclePathToNeighboringDots(Dot currentDot, Dot toDot, int xmin, int xmax, int ymin, int ymax,
+                                                        Dot[] path, AtomicInteger pathIndex, Set<Dot> visited, int ownerId){
         int x = currentDot.getX();
         int y = currentDot.getY();
         if(x < xmin)
@@ -202,8 +214,8 @@ public class Board {
             for(int j = y-1; j<= y+1 ; j++){
                 if( i == x && j == y)
                     continue;
-                neighbouringDot = getDot(i,j,activePlayer);
-                if( isAvailable(neighbouringDot,visited) && findCyclePath(neighbouringDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited) )
+                neighbouringDot = getDot(i,j,ownerId);
+                if( isAvailable(neighbouringDot,visited) && findCyclePath(neighbouringDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited, ownerId) )
                     return true;
             }
         }
@@ -217,39 +229,56 @@ public class Board {
 
     private void extendCycle(Cycle cycle){
         DotNode dn = cycle.getDotNode();
+        int ownerId = cycle.getDotNode().d.getOwnerId();
         while (dn != null){
-            Dot[] path = new Dot[(dotNb+3)/2]; // size == nb of player's dots
+            Dot[] path = new Dot[(dotNb+1)/2]; // size == nb of player's dots
             AtomicInteger pathIndex = new AtomicInteger(0);
             HashSet<Dot> visited = new HashSet<>();
-            if(findPathExtendingCycle(cycle, dn.d, path, pathIndex, visited)) {
-                //System.out.println(" From node:" + path[0].getX()+"'" + path[0].getY());
-                //System.out.println(" Replacement Path:");
+            if(findPathExtendingCycle(cycle, dn.d, path, pathIndex, visited, ownerId)) {
+                System.out.println(" From node:" + path[0].getX()+"'" + path[0].getY());
+                System.out.println(" Replacement Path:");
                 for(int i = 0 ; i < pathIndex.get(); i++){
                     Dot d = path[i];
                     System.out.println("x:" + d.getX()+" y:" + d.getY());
                 }
-                cycle.replacePath(dn, path, pathIndex.get());
+                Dot lastDot = path[pathIndex.get()-1];
+                LinkedList<Dot> oldPath = cycle.replacePath(dn, path, pathIndex.get());
+                if(oldPath.size() > 0) {
+                    boolean hasInsideAnyOfOldDots = false;
+                    for(Dot d: oldPath){
+                        if (cycle.hasInside(d))
+                        {
+                            hasInsideAnyOfOldDots = true;
+                            break;
+                        }
+                    }
+                    if(!hasInsideAnyOfOldDots){
+                        DotNode lastDn = cycle.findDnWithDot(lastDot);
+                        if(lastDn.next == null)
+                            while (!oldPath.isEmpty()){
+                                lastDn = lastDn.next = new DotNode(oldPath.removeLast(),null);
+                            }
+                    }
+                }
                 dn = cycle.getDotNode();
-                //System.out.println("Path was repeeeeeeeeed");
             }
             else
                 dn = dn.next;
         }
     }
 
-    private boolean findPathExtendingCycle(Cycle cycle, Dot startingDot, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean findPathExtendingCycle(Cycle cycle, Dot startingDot, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited, int ownerId){
         visited.add(startingDot);
         path[pathIndex.get()] = startingDot;
         pathIndex.set(pathIndex.get() + 1);
-        if(applyFindPathToCycleToNeighboringDotsOutsideCycle(cycle,startingDot,path, pathIndex, visited))
+        if(applyFindPathToCycleToNeighboringDotsOutsideCycle(cycle,startingDot,path, pathIndex, visited, ownerId))
             return true;
 
-        visited.remove(startingDot);
-        pathIndex.set(pathIndex.get() -1);
         return false;
     }
 
-    private boolean applyFindPathToCycleToNeighboringDotsOutsideCycle(Cycle cycle, Dot startingDot, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean applyFindPathToCycleToNeighboringDotsOutsideCycle(Cycle cycle, Dot startingDot, Dot[] path, AtomicInteger pathIndex,
+                                                                      Set<Dot> visited, int ownerId){
         int x = startingDot.getX();
         int y = startingDot.getY();
 
@@ -258,16 +287,17 @@ public class Board {
             for(int j = y-1; j<= y+1 ; j++){
                 if( i == x && j == y)
                     continue;
-                neighbouringDot = getDot(x,y-1, activePlayer);
-                if( isAvailableForOutsidePath(neighbouringDot, startingDot, cycle,visited, pathIndex.get())
-                        && findPathToCycle(neighbouringDot, startingDot, cycle, path, pathIndex, visited) )
+                neighbouringDot = getDot(i,j, ownerId);
+                if( isAvailableForOutsidePath(startingDot, neighbouringDot, startingDot, cycle, visited, pathIndex.get(), ownerId)
+                        && findPathToCycle(neighbouringDot, startingDot, cycle, path, pathIndex, visited, ownerId) )
                     return true;
             }
         }
         return false;
     }
 
-    private boolean findPathToCycle(Dot currentDot, Dot fromDot,Cycle toCycle,Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean findPathToCycle(Dot currentDot, Dot fromDot,Cycle toCycle,Dot[] path, AtomicInteger pathIndex,
+                                    Set<Dot> visited, int ownerId){
         visited.add(currentDot);
         path[pathIndex.get()] = currentDot;
         pathIndex.set(pathIndex.get() + 1);
@@ -275,7 +305,7 @@ public class Board {
         if ( toCycle.contains(currentDot))
             return true;
 
-        if(applyFindPathToCycleViaNeighboringDots(currentDot, fromDot, toCycle, path, pathIndex, visited))
+        if(applyFindPathToCycleViaNeighboringDots(currentDot, fromDot, toCycle, path, pathIndex, visited, ownerId))
             return true;
 
         pathIndex.set(pathIndex.get() -1);
@@ -283,7 +313,8 @@ public class Board {
         return false;
     }
 
-    private boolean applyFindPathToCycleViaNeighboringDots(Dot currentDot, Dot fromDot, Cycle toCycle, Dot[] path, AtomicInteger pathIndex, Set<Dot> visited){
+    private boolean applyFindPathToCycleViaNeighboringDots(Dot currentDot, Dot fromDot, Cycle toCycle, Dot[] path, AtomicInteger pathIndex,
+                                                           Set<Dot> visited, int ownerId){
         int x = currentDot.getX();
         int y = currentDot.getY();
 
@@ -292,9 +323,9 @@ public class Board {
             for(int j = y-1; j<= y+1 ; j++){
                 if( i == x && j == y)
                     continue;
-                neighbouringDot = getDot(x,y-1, activePlayer);
-                if( isAvailableForOutsidePath(neighbouringDot, fromDot, toCycle, visited, pathIndex.get())
-                        && findPathToCycle(neighbouringDot, fromDot, toCycle, path, pathIndex, visited) )
+                neighbouringDot = getDot(i,j, ownerId);
+                if( isAvailableForOutsidePath(currentDot, neighbouringDot, fromDot, toCycle, visited, pathIndex.get(), ownerId)
+                        && findPathToCycle(neighbouringDot, fromDot, toCycle, path, pathIndex, visited, ownerId) )
                     return true;
             }
         }
@@ -309,7 +340,8 @@ public class Board {
     private void shrinkCycleToBordersWithBases(Cycle cycle){
         DotNode dn = cycle.getDotNode();
         List<Base> basesContainingD;
-        Set<Base> bases = new HashSet<>(basesOfPlayer[activePlayer]);
+        int ownerId = cycle.getDotNode().d.getOwnerId();
+        Set<Base> bases = new HashSet<>(basesOfPlayers[ownerId]);
 
         while (dn != null){
             basesContainingD = getBasesFromASetContainingDot(dn.d, bases);
@@ -342,8 +374,8 @@ public class Board {
 
     ///
 
-    private void replaceOldCyclesWithANewOne(Cycle newCycle, int activePlayer){
-        Set<Cycle> cyclesOfActivePlayer = cyclesOfPlayers[activePlayer];
+    private void replaceOldCyclesWithANewOne(Cycle newCycle, int ownerId){
+        Set<Cycle> cyclesOfActivePlayer = cyclesOfPlayers[ownerId];
         Set<Cycle> cyclesToRemove = new HashSet<>();
         for(Cycle c: cyclesOfActivePlayer) {
             if (newCycle.doesOverlapWithCycleOrDoesContainIt(c))
@@ -357,40 +389,52 @@ public class Board {
 
     /// CREATE BASE
 
-    private Base createBase(Cycle cycle, int owner) {
+    private Base createBase(Cycle cycle, int baseOwner) {
         System.out.println("Base created!");
         cycle.printCycle();
         cyclesOfPlayers[activePlayer].remove(cycle);
-        Base base = new Base(cycle, this, owner);
-        for (int i = 0; i < 2; i++) {                     // usun zamkniete wewnatrz bazy i cykle
-            Set<Cycle> cyclesOfPlayer = cyclesOfPlayers[i];
+        Base newBase = new Base(cycle, this, baseOwner);
+        for (int playerId = 0; playerId < 2; playerId++) {                     // delete surrounded Bases and Cycles
+            Set<Cycle> cyclesOfPlayer = cyclesOfPlayers[playerId];
+            Set<Cycle> cyclesToRemove = new HashSet<>();
             for (Cycle c : cyclesOfPlayer) {
                 if (cycle.doesContainACycle(c))
-                    cyclesOfPlayer.remove(c);
+                    cyclesToRemove.add(c);
                 else if (cycle.doesOverlapWithCycle(c)) {
                     if (shrinkCycleIfItWasReduced(c, cycle) == null)
-                        cyclesOfPlayer.remove(c);
+                        cyclesToRemove.add(c);
                 }
             }
+            cyclesOfPlayer.removeAll(cyclesToRemove);
+            Set<Base> basesOfPlayer = basesOfPlayers[playerId];
+            Set<Base> basesToRemove = new HashSet<>();
+            for (Base base : basesOfPlayer){
+                if(newBase.doesContainACycle(base.getCycle()))
+                    basesToRemove.add(base);
+            }
+            basesOfPlayer.removeAll(basesToRemove);
         }
-
         int pointsCount = 0;
         for (int x = cycle.getXmin() + 1; x < cycle.getXmax(); x++)
             for (int y = cycle.getYmin() + 1; y < cycle.getYmax(); y++) {
                 Dot d = getDot(x, y);
-                if (d != null && cycle.hasInside(d)) {
+                if (d == null && newBase.hasInside(d = new Dot(x, y, -1))){
+                    freeDotSpaces.remove(d);
+                }
+                else if(cycle.hasInside(d)) {
                     d.markAsInsideBase();
-                    if (d.getOwnerId() == activePlayer)
+                    if (d.getOwnerId() == baseOwner)
                         pointsCount--;
-                    else
+                    else if(d.getOwnerId() == 1 - baseOwner)
                         pointsCount++;
                 }
             }
-        base.setPointsCount(pointsCount);
-        basesOfPlayer[activePlayer].add(base);
-        System.out.println( "playerBaseCount: " + basesOfPlayer[owner].size());
+        newBase.setPointsCount(pointsCount);
+        basesOfPlayers[activePlayer].add(newBase);
+        System.out.println( "playerBaseCount: " + basesOfPlayers[baseOwner].size());
         // policz punkty: wersja ambitna lub (malo kosztowny) brute force: zlicz pkty z baz kazdego z graczy
-        return base;
+        System.out.println(""+ freeDotSpaces.size() +" remain free");
+        return newBase;
     }
 
     private Cycle shrinkCycleIfItWasReduced(Cycle cycleToBeShrinked, Cycle base){
@@ -399,6 +443,10 @@ public class Board {
             if (base.hasOutside(d))
                 if( null != (newCycle = aNewCycleCreatedByDot(d)) )
                     break;
+        }
+        if(newCycle != null) {
+            extendCycle(newCycle);
+            shrinkCycleToBordersWithBases(newCycle);
         }
         return newCycle;
     }
@@ -411,10 +459,10 @@ public class Board {
     private boolean isPlacingADotPossible(Dot d){       // checking if d is a border of a cycle is not needed
         if(matrixOfDots[d.getX()][d.getY()] != null)
             return false;
-        for (Base b: basesOfPlayer[1-activePlayer])
+        for (Base b: basesOfPlayers[1-activePlayer])
             if ( b.hasInside(d))
                 return false;
-        for (Base b: basesOfPlayer[activePlayer])
+        for (Base b: basesOfPlayers[activePlayer])
             if ( b.hasInside(d))
                 return false;
         return true;
@@ -432,10 +480,28 @@ public class Board {
                 && !neighbouringDot.equals(fromDot);
     }
 
-    private boolean isAvailableForOutsidePath(Dot neighbouringDot, Dot fromDot, Cycle cycle, Set<Dot> visited, int pathInd){
-        return isAvailableExcludingFromDot(neighbouringDot, fromDot, visited)
-                && !(pathInd == 1 && cycle.contains(neighbouringDot))
-                && !cycle.hasInside(neighbouringDot);
+    private boolean isAvailableForOutsidePath(Dot prevDot, Dot neighbouringDot, Dot fromDot, Cycle cycle, Set<Dot> visited, int pathInd, int ownerId){
+        if( !isAvailableExcludingFromDot(neighbouringDot, fromDot, visited)
+                || (pathInd == 1 && cycle.contains(neighbouringDot))
+                || cycle.hasInside(neighbouringDot))
+            return false;
+        int xPrev = prevDot.getX();
+        int yPrev = prevDot.getY();
+        int xNeib = neighbouringDot.getX();
+        int yNeib = neighbouringDot.getY();
+        int pxGreater = xPrev - xNeib;
+        int pyGreater = yPrev - yNeib;
+        if( Math.abs(pxGreater) + Math.abs(pyGreater) >= 2){
+            Dot crossPoint1 = pxGreater > 0 ? getDot(xPrev - 1, yPrev, ownerId) : getDot(xPrev + 1, yPrev, ownerId);
+            Dot crossPoint2 = pyGreater > 0 ? getDot(xPrev, yPrev - 1, ownerId) : getDot(xPrev, yPrev + 1, ownerId);
+            if(crossPoint1 != null && crossPoint2 != null && cycle.contains(crossPoint1) && cycle.contains(crossPoint2)){
+                DotNode crossPoint1Dn = cycle.findDnWithDot(crossPoint1);
+                DotNode crossPoint2Dn = cycle.findDnWithDot(crossPoint2);
+                if(crossPoint1Dn.next == crossPoint2Dn || crossPoint2Dn.next == crossPoint1Dn)
+                    return false;
+            }
+        }
+        return true;
     }
 
 
@@ -477,7 +543,7 @@ public class Board {
     private Base getBaseContainingDot(Dot d){
         int x = d.getX();
         int y = d.getY();
-        for (Base b : basesOfPlayer[activePlayer]) {
+        for (Base b : basesOfPlayers[activePlayer]) {
             if(b.contains(d))
                 return b;
         }
@@ -488,13 +554,16 @@ public class Board {
         return getCycleFromASetHavingADotInside(dot, cyclesOfPlayers[1-activePlayer]);
     }
 
-    private void updatePoints(int activePlayer){
-        int activePlayerPointsCount = 0;
-        for (Base b : basesOfPlayer[activePlayer]){
-            activePlayerPointsCount += b.getPointsCount();
+    private void updatePoints(){
+        for(int playerId = 0; playerId<2; playerId++){
+            int playerPointCount = 0;
+            for(Base base : basesOfPlayers[playerId]){
+                playerPointCount += base.getPointsCount();
+            }
+            this.pointsPlayer[playerId] = playerPointCount;
         }
-        if (activePlayer == 0) Settings.GAME_SETTINGS.getP1().setPoints(activePlayerPointsCount);
-        else Settings.GAME_SETTINGS.getP2().setPoints(activePlayerPointsCount);
+        Settings.GAME_SETTINGS.getP1().setPoints(this.pointsPlayer[0]);
+        Settings.GAME_SETTINGS.getP2().setPoints(this.pointsPlayer[1]);
     }
 
     /// AUXILIARY METHODS

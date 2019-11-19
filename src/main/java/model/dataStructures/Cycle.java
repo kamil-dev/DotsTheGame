@@ -7,7 +7,7 @@ import main.java.model.Board;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Cycle implements ICycle {
+public class Cycle implements ICycle, Cloneable {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;
@@ -69,12 +69,14 @@ public class Cycle implements ICycle {
 
     // assumption of order guarantee:
     //      we have a guarantee that toDot is next from fromDot in Board::extendCycle
-    public void replacePath(DotNode firstDn, Dot[] path, int pathIndex)
+    // returns oldPath
+    public LinkedList<Dot> replacePath(DotNode firstDn, Dot[] path, int pathIndex)
     {
         Dot toDot =  path[--pathIndex];
         System.out.println("replace path TO DOT:" + toDot.getX() +"," + toDot.getY());
 
-        DotNode toDotDn = deleteOldPath(firstDn, toDot);
+        LinkedList<Dot> oldPath = new LinkedList<>();
+        DotNode toDotDn = deleteOldPath(firstDn, toDot, oldPath);
 
         DotNode dn = firstDn;
         for (int i = 1 ; i< pathIndex ; i++){          // add new dots to cycle // path[0] is a fromDot
@@ -87,6 +89,7 @@ public class Cycle implements ICycle {
         System.out.println("cycle after replace path");
         printCycle();
         this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
+        return oldPath;
     }
 
     public void recomputeMinAndMaxCoordinatesAndResetDotsSet()
@@ -258,7 +261,6 @@ public class Cycle implements ICycle {
 
     public void cutBase(DotNode firstDnc, Base base){
 
-
         DotNode firstDnb = base.getDotNode();
         while (!firstDnb.equals(firstDnc))
             firstDnb = base.getNext(firstDnb);
@@ -308,6 +310,16 @@ public class Cycle implements ICycle {
         return dn.next;
     }
 
+    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc, LinkedList<Dot> oldPath){
+        DotNode dn = fDnc;
+        while (dn.next.d != lDotnc){
+            dn = dn.next;
+            dotsSet.remove(dn.d);
+            oldPath.addLast(dn.d);
+        }
+        return dn.next;
+    }
+
     private void addNewPath(DotNode fDnc, DotNode fDnbNext, DotNode lDnc, Base base){
         DotNode dnc = fDnc;
         DotNode dnb = fDnbNext;
@@ -338,6 +350,18 @@ public class Cycle implements ICycle {
             dn = dn.next;
         }while (dn!= null);
     }
+
+    public DotNode findDnWithDot(Dot d){
+        DotNode dn = this.dotNode;
+        while (dn!=null){
+            if(dn.d.equals(d))
+                return dn;
+            dn = dn.next;
+        }
+        return null;
+    }
+
+
 
     public int getXmin() {
         return xmin;
