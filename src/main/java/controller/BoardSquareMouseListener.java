@@ -21,6 +21,8 @@ public class BoardSquareMouseListener extends MouseAdapter implements Serializab
 
     public void mouseClicked(MouseEvent e) {
         super.mouseClicked(e);
+        if(bs.getState() == 3)
+            return;
         if (settings.getP1().isActive()) {
             if (bs.getState() == 0) {
                 settings.getBoard().addDot(bs.getRow(), bs.getColumn());

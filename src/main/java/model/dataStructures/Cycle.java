@@ -7,13 +7,7 @@ import main.java.model.Board;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
-    ==========================
-     CLASS IN CONSTRUCTION!!!!!
-    ==========================
- */
-
-public class Cycle implements main.java.model.dataStructures.ICycle {
+public class Cycle implements ICycle, Cloneable {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;
@@ -75,12 +69,14 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
 
     // assumption of order guarantee:
     //      we have a guarantee that toDot is next from fromDot in Board::extendCycle
-    public void replacePath(DotNode firstDn, Dot[] path, int pathIndex)
+    // returns oldPath
+    public LinkedList<Dot> replacePath(DotNode firstDn, Dot[] path, int pathIndex)
     {
         Dot toDot =  path[--pathIndex];
         System.out.println("replace path TO DOT:" + toDot.getX() +"," + toDot.getY());
 
-        DotNode toDotDn = deleteOldPath(firstDn, toDot);
+        LinkedList<Dot> oldPath = new LinkedList<>();
+        DotNode toDotDn = deleteOldPath(firstDn, toDot, oldPath);
 
         DotNode dn = firstDn;
         for (int i = 1 ; i< pathIndex ; i++){          // add new dots to cycle // path[0] is a fromDot
@@ -93,6 +89,7 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         System.out.println("cycle after replace path");
         printCycle();
         this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
+        return oldPath;
     }
 
     public void recomputeMinAndMaxCoordinatesAndResetDotsSet()
@@ -127,6 +124,13 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         return dn.next!=null ? dn.next : this.getDotNode();
     }
 
+    public DotNode getDotNodeWithDot(Dot d){
+        DotNode dn = this.dotNode;
+        while (dn!=null && !dn.d.equals(d))
+            dn = dn.next;
+        return dn;
+    }
+
     public boolean doesOverlapWithCycleOrDoesContainIt(Cycle c) {
         int commonDotsCount = 0;
         for (Dot d : c.dotsSet) {
@@ -147,11 +151,14 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         return false;
     }
 
+
+
     public boolean doesContainACycle(Cycle c){
-        if(    c.getYmax()<= this.getYmax() && c.getYmin() >= this.getYmin()
-                && c.getXmax()<= this.getXmax() && c.getXmin() >= this.getXmin() )
-            return true;
-        return false;
+        for(Dot d : c.getDotsSet()){
+            if (this.hasOutside(d))
+                return false;
+        }
+        return true;
     }
 
     public boolean contains(Dot d){
@@ -163,36 +170,63 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
     // with an exception:
     // when (d.getX()== xmin || d.getX()== xmax) dot is never inside a circle
     public boolean hasInside(Dot d) {
-        if (dotsSet.contains( d))
+//        if (dotsSet.contains( d))
+//            return false;
+//        int x = d.getX();
+//        int y = d.getY();
+//
+//        boolean northDn = false;
+//        boolean southDn = false;
+//        boolean eastDn = false;
+//        boolean westDn = false;
+//
+//
+//        DotNode dn = this.dotNode;
+//
+//        while (dn != null){
+//            if (dn.getX() == x)
+//            {
+//                if(dn.getY() < y)
+//                    westDn = true;
+//                else
+//                    eastDn = true;
+//            }
+//            if(dn.getY() == y){
+//                if(dn.getX() < x)
+//                    northDn = true;
+//                else
+//                    southDn = true;
+//            }
+//            dn = dn.next;
+//        }
+//        return northDn && eastDn && westDn && southDn;
+        if (this.contains(d))
             return false;
+
         int x = d.getX();
         int y = d.getY();
 
-        boolean northDn = false;
-        boolean southDn = false;
-        boolean eastDn = false;
-        boolean westDn = false;
+        int borderCrossCount = 0;
 
+        DotNode stopDn = getLastDotDnOnLineOfNeighboringDotsWithTheSameX(this.dotNode);
 
-        DotNode dn = this.dotNode;
+        DotNode prevDnc = stopDn;
+        DotNode dnc;
+        do{
+            dnc = getNext(prevDnc);
+            dnc = getLastDotDnOnLineOfNeighboringDotsWithTheSameX(dnc);
 
-        while (dn != null){
-            if (dn.getX() == x)
-            {
-                if(dn.getY() < y)
-                    westDn = true;
-                else
-                    eastDn = true;
+            Dot dot = dnc.d;
+            if(dot.getX() == x && dot.getY() < y) {
+                if (isCrossing(prevDnc, dnc))
+                    borderCrossCount++;
             }
-            if(dn.getY() == y){
-                if(dn.getX() < x)
-                    northDn = true;
-                else
-                    southDn = true;
-            }
-            dn = dn.next;
-        }
-        return northDn && eastDn && westDn && southDn;
+
+            prevDnc = dnc;
+        }while (prevDnc != stopDn);
+
+        return (borderCrossCount%2) == 1;
+
 
 //        int x = d.getX();
 //
@@ -223,11 +257,28 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
 //
 //        return (borderCrossCount%2) == 1;
     }
+    
+    public boolean areNeighbours(DotNode dn1, DotNode dn2){
+        return dn1.next == dn2 || dn2.next == dn1;
+    }
 
-//    private boolean areNeighbours(DotNode dn1, DotNode dn2){
-//        return dn1.next == dn2 || dn2.next == dn1;
-//    }
-//
+    private boolean isCrossing(DotNode prevDn, DotNode dn){
+        DotNode nextDn = getNext(dn);
+        return ( prevDn.getX() < dn.getX() && dn.getX() < nextDn.getX() )
+                ||
+                (prevDn.getX() > dn.getX() && dn.getX() > nextDn.getX());
+    }
+
+    private DotNode getLastDotDnOnLineOfNeighboringDotsWithTheSameX(DotNode prevDn){
+        int x = prevDn.getX();
+        DotNode dn = getNext(prevDn);
+        while (dn.getX() == x){
+            prevDn = dn;
+            dn = getNext(dn);
+        }
+        return prevDn;
+    }
+
 //    private boolean areOpposite(DotNode prevDn, DotNode dn){
 //        DotNode nextDn = dn.next!= null ? dn.next : this.dotNode;
 //        return ( prevDn.getX() < dn.getX() && dn.getX() < nextDn.getX() )
@@ -260,9 +311,8 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
     }
 
     public void cutBase(DotNode firstDnc, Base base){
-        DotNode firstDnb = base.getDotNode();
-        while (!firstDnb.equals(firstDnc))
-            firstDnb = base.getNext(firstDnb);
+
+        DotNode firstDnb = base.getCycle().findDnWithDot(firstDnc.d);
 
         DotNode lastDncOnBase = firstDnc;
         DotNode dn = firstDnc;
@@ -272,12 +322,15 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
             dn = dn.next;
         }
 
-        deleteOldPath(firstDnc,lastDncOnBase);
-
         DotNode firstDnbNext = base.getNext(firstDnb);
         DotNode firstDncNext =  firstDnc.next ; // firstDnc.next musi istniec w przeciwnym wypadku bledne wywolanie
 
+        deleteOldPath(firstDnc,lastDncOnBase);
+
         if (firstDnbNext.d != firstDncNext.d) {     // base cycle goes in an opposite direction - cool
+            addNewPath(firstDnc,firstDnbNext,lastDncOnBase,base);
+        }
+        else {
             DotNode dnb = firstDnbNext;
             while (!dnb.equals(lastDncOnBase)){
                 dnb = base.getNext(dnb);
@@ -285,9 +338,6 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
             DotNode lastDnbOnCycle = dnb;
 
             addNewPathReverse(lastDncOnBase, lastDnbOnCycle, firstDnc, base);
-        }
-        else {
-            addNewPath(firstDnc,firstDnbNext,lastDncOnBase,base);
         }
 
         this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
@@ -309,6 +359,16 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         return dn.next;
     }
 
+    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc, LinkedList<Dot> oldPath){
+        DotNode dn = fDnc;
+        while (dn.next.d != lDotnc){
+            dn = dn.next;
+            dotsSet.remove(dn.d);
+            oldPath.addLast(dn.d);
+        }
+        return dn.next;
+    }
+
     private void addNewPath(DotNode fDnc, DotNode fDnbNext, DotNode lDnc, Base base){
         DotNode dnc = fDnc;
         DotNode dnb = fDnbNext;
@@ -325,9 +385,11 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
         DotNode dnb = base.getNext(lDnb);
         while ( !dnb.equals(fDnc)){
             Dot d = dnb.d;
+            dnc = new DotNode(d,dnc);
             dotsSet.add(d);
             dnb = base.getNext(dnb);
         }
+        fDnc.next = dnc;
     }
 
     public void printCycle(){
@@ -339,6 +401,18 @@ public class Cycle implements main.java.model.dataStructures.ICycle {
             dn = dn.next;
         }while (dn!= null);
     }
+
+    public DotNode findDnWithDot(Dot d){
+        DotNode dn = this.dotNode;
+        while (dn!=null){
+            if(dn.d.equals(d))
+                return dn;
+            dn = dn.next;
+        }
+        return null;
+    }
+
+
 
     public int getXmin() {
         return xmin;

@@ -4,12 +4,6 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
-/*
-    ==========================
-     CLASS IN CONSTRUCTION!!!!!
-    ==========================
- */
-
 public class Base implements ICycle{
     private int ownerId;
     private Cycle cycle;
@@ -42,6 +36,10 @@ public class Base implements ICycle{
         return cycle.hasOutside(d);
     }
 
+    public boolean doesContainACycle(Cycle cycle){
+        return this.getCycle().doesContainACycle(cycle);
+    }
+
     private int countPoints(){
         int pointsCount = 0;
         for(int i = this.cycle.getXmin(); i<=this.cycle.getXmax(); i++)
@@ -67,6 +65,10 @@ public class Base implements ICycle{
 
     public DotNode getDotNode(){
         return this.cycle.getDotNode();
+    }
+
+    public DotNode getDotNodeWithDot(Dot d) {
+        return this.cycle.getDotNodeWithDot(d);
     }
 //    public int getXmin() {
 //        return cycle.getXmin();

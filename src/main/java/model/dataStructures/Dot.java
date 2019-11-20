@@ -7,7 +7,7 @@ public class Dot {
     private int ownerId;
     private boolean isInsideBase;
 
-    // max size of a board ensuring unique hashcodes set to 1000
+        // max size of a board ensuring unique hashcodes set to 1000
     public Dot(int x, int y, int ownerId) {
         this.x = x;
         this.y = y;
