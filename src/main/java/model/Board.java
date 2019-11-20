@@ -215,7 +215,8 @@ public class Board {
                 if( i == x && j == y)
                     continue;
                 neighbouringDot = getDot(i,j,ownerId);
-                if( isAvailable(neighbouringDot,visited) && findCyclePath(neighbouringDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited, ownerId) )
+                if( isAvailableNew(currentDot, neighbouringDot, path, pathIndex, ownerId, visited)
+                        && findCyclePath(neighbouringDot, toDot, xmin, xmax, ymin, ymax, path, pathIndex, visited, ownerId) )
                     return true;
             }
         }
@@ -420,6 +421,7 @@ public class Board {
                 Dot d = getDot(x, y);
                 if (d == null && newBase.hasInside(d = new Dot(x, y, -1))){
                     freeDotSpaces.remove(d);
+                    Settings.GAME_SETTINGS.getBoardSquares()[d.getX()][d.getY()].setState(3);
                 }
                 else if(cycle.hasInside(d)) {
                     d.markAsInsideBase();
@@ -430,8 +432,9 @@ public class Board {
                 }
             }
         newBase.setPointsCount(pointsCount);
-        basesOfPlayers[activePlayer].add(newBase);
+        basesOfPlayers[baseOwner].add(newBase);
         System.out.println( "playerBaseCount: " + basesOfPlayers[baseOwner].size());
+        //for(int i = 0; i<basesOfPlayers)
         // policz punkty: wersja ambitna lub (malo kosztowny) brute force: zlicz pkty z baz kazdego z graczy
         System.out.println(""+ freeDotSpaces.size() +" remain free");
         return newBase;
@@ -468,6 +471,11 @@ public class Board {
         return true;
     }
 
+    private boolean isAvailableNew(Dot prevDot, Dot neighbouringDot, Dot[] path, AtomicInteger pathIndex, int ownerId, Set<Dot> visited){
+        if(!isAvailable(neighbouringDot, visited))
+            return false;
+        return doesCutAnEdge(prevDot, neighbouringDot, path, pathIndex, ownerId);
+    }
 
     private boolean isAvailable(Dot neighbouringDot, Set<Dot> visited){
         return neighbouringDot!= null
@@ -475,16 +483,24 @@ public class Board {
                 && !visited.contains(neighbouringDot);
     }
 
-    private boolean isAvailableExcludingFromDot(Dot neighbouringDot, Dot fromDot, Set<Dot> visited){
-        return isAvailable(neighbouringDot,visited)
-                && !neighbouringDot.equals(fromDot);
-    }
-
     private boolean isAvailableForOutsidePath(Dot prevDot, Dot neighbouringDot, Dot fromDot, Cycle cycle, Set<Dot> visited, int pathInd, int ownerId){
-        if( !isAvailableExcludingFromDot(neighbouringDot, fromDot, visited)
+        if( !isAvailable(neighbouringDot,visited)
+                || neighbouringDot.equals(fromDot)
                 || (pathInd == 1 && cycle.contains(neighbouringDot))
                 || cycle.hasInside(neighbouringDot))
             return false;
+        return doesCutAnEdge(prevDot,neighbouringDot,cycle,ownerId);
+    }
+
+    private boolean doesCutAnEdge(Dot prevDot, Dot neighbouringDot, Cycle cycle, int ownerId){
+        for(Base base : basesOfPlayers[ownerId]){
+            if (base.contains(prevDot) && base.contains(neighbouringDot)){
+                DotNode dn1 = base.getDotNodeWithDot(prevDot);
+                DotNode dn2 = base.getDotNodeWithDot(neighbouringDot);
+                if( !cycle.areNeighbours(dn1,dn2) )
+                    return false;
+            }
+        }
         int xPrev = prevDot.getX();
         int yPrev = prevDot.getY();
         int xNeib = neighbouringDot.getX();
@@ -504,6 +520,38 @@ public class Board {
         return true;
     }
 
+    private boolean doesCutAnEdge(Dot prevDot, Dot neighbouringDot, Dot[] path, AtomicInteger pathIndex, int ownerId){
+        int xPrev = prevDot.getX();
+        int yPrev = prevDot.getY();
+        int xNeib = neighbouringDot.getX();
+        int yNeib = neighbouringDot.getY();
+        int pxGreater = xPrev - xNeib;
+        int pyGreater = yPrev - yNeib;
+        if( Math.abs(pxGreater) + Math.abs(pyGreater) >= 2){
+            Dot crossPoint1 = pxGreater > 0 ? getDot(xPrev - 1, yPrev, ownerId) : getDot(xPrev + 1, yPrev, ownerId);
+            Dot crossPoint2 = pyGreater > 0 ? getDot(xPrev, yPrev - 1, ownerId) : getDot(xPrev, yPrev + 1, ownerId);
+            if(crossPoint1 != null && crossPoint2 != null){
+                for (int i = 0; i< pathIndex.get(); i++ ){
+                    if(path[i].equals(crossPoint1)){
+                        if(i+1 < pathIndex.get() && path[i+1].equals(crossPoint2))
+                            return false;
+                        break;
+                    }
+                    if(path[i].equals(crossPoint2)){
+                        if(i+1 < pathIndex.get() && path[i+1].equals(crossPoint1))
+                            return false;
+                        break;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private int findDotIndInPath(Dot d, Dot[] path, AtomicInteger pathIndex){
+
+        return -1;
+    }
 
     private List<Base> getBasesFromASetContainingDot(Dot d, Set<Base> bases){
         LinkedList<Base> basesList = new LinkedList<>();

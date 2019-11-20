@@ -66,6 +66,10 @@ public class Base implements ICycle{
     public DotNode getDotNode(){
         return this.cycle.getDotNode();
     }
+
+    public DotNode getDotNodeWithDot(Dot d) {
+        return this.cycle.getDotNodeWithDot(d);
+    }
 //    public int getXmin() {
 //        return cycle.getXmin();
 //    }
