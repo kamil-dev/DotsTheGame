@@ -2,7 +2,9 @@
  Author: Marcin Bartosiak */
 package main.java.model.dataStructures;
 
-public class DotNode {
+import java.io.Serializable;
+
+public class DotNode implements Serializable {
     public Dot d;
     public DotNode next;
 

@@ -4,10 +4,11 @@ package main.java.model.dataStructures;
 
 import main.java.model.Board;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Cycle implements ICycle, Cloneable {
+public class Cycle implements ICycle, Cloneable, Serializable {
     private Board board;
     private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
     private int xmin = Integer.MAX_VALUE;

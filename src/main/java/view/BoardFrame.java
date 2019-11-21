@@ -168,8 +168,11 @@ public class BoardFrame extends JFrame {
         Player p1 = Settings.gameSettings.getP1();
         Player p2 = Settings.gameSettings.getP2();
 
+
+
         @Override
         public void actionPerformed(ActionEvent e) {
+            scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
             if (p1.isActive()) {
                 p1.setRemainingTime(p1.getRemainingTime() - 1);
                 playerOneTimerLabel.setText(timerIntoString(p1.getRemainingTime()));

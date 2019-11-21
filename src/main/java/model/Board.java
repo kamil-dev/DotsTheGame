@@ -3,10 +3,11 @@ package main.java.model;
 import main.java.model.dataStructures.*;
 import main.java.view.BoardSquare;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Board {
+public class Board implements Serializable {
     private Dot[][] matrixOfDots;
     private int size;
     private int dotNb = 1;
@@ -612,6 +613,9 @@ public class Board {
         }
         Settings.gameSettings.getP1().setPoints(this.pointsPlayer[0]);
         Settings.gameSettings.getP2().setPoints(this.pointsPlayer[1]);
+        System.out.println("Update activated");
+        System.out.println(Settings.gameSettings.getP1().getPoints() + " : " + Settings.gameSettings.getP2().getPoints());
+
     }
 
     /// AUXILIARY METHODS
