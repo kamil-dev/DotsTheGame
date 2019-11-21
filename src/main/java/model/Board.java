@@ -2,6 +2,8 @@ package main.java.model;
 
 import main.java.model.dataStructures.*;
 import main.java.view.BoardSquare;
+import main.java.view.EndFrame;
+import main.java.view.EndGameCause;
 
 import java.io.Serializable;
 import java.util.*;
@@ -438,6 +440,12 @@ public class Board implements Serializable {
         //for(int i = 0; i<basesOfPlayers)
         // policz punkty: wersja ambitna lub (malo kosztowny) brute force: zlicz pkty z baz kazdego z graczy
         System.out.println(""+ freeDotSpaces.size() +" remain free");
+        if (freeDotSpaces.size() == 0) {
+            Player p1 = Settings.gameSettings.getP1();
+            Player p2 = Settings.gameSettings.getP2();
+            EndFrame endFrame = new EndFrame( (p1.getPoints() > p2.getPoints()) ? p1 : p2 , EndGameCause.NO_AVAILABLE_MOVE );
+        }
+
         return newBase;
     }
 
