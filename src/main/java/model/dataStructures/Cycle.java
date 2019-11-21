@@ -203,6 +203,8 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 //        return northDn && eastDn && westDn && southDn;
         if (this.contains(d))
             return false;
+        if (this.getXmax() - this.getXmin() < 2 || this.getYmax() - this.getYmin() < 2)
+            return false;
 
         int x = d.getX();
         int y = d.getY();
@@ -341,7 +343,7 @@ public class Cycle implements ICycle, Cloneable, Serializable {
             addNewPathReverse(lastDncOnBase, lastDnbOnCycle, firstDnc, base);
         }
 
-        this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
+        //this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
     }
 
     private void deleteOldPath(DotNode fDnc, DotNode lDnc){
