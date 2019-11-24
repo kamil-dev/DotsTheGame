@@ -71,12 +71,12 @@ public class Cycle implements ICycle, Cloneable, Serializable {
     // assumption of order guarantee:
     //      we have a guarantee that toDot is next from fromDot in Board::extendCycle
     // returns oldPath
-    public LinkedList<Dot> replacePath(DotNode firstDn, Dot[] path, int pathIndex)
+    public LinkedList<DotNode> replacePath(DotNode firstDn, Dot[] path, int pathIndex)
     {
         Dot toDot =  path[--pathIndex];
         System.out.println("replace path TO DOT:" + toDot.getX() +"," + toDot.getY());
 
-        LinkedList<Dot> oldPath = new LinkedList<>();
+        LinkedList<DotNode> oldPath = new LinkedList<>();
         DotNode toDotDn = deleteOldPath(firstDn, toDot, oldPath);
 
         DotNode dn = firstDn;
@@ -128,6 +128,13 @@ public class Cycle implements ICycle, Cloneable, Serializable {
     public DotNode getDotNodeWithDot(Dot d){
         DotNode dn = this.dotNode;
         while (dn!=null && !dn.d.equals(d))
+            dn = dn.next;
+        return dn;
+    }
+
+    public DotNode getLastDn(){
+        DotNode dn = this.getDotNode();
+        while (dn.next != null)
             dn = dn.next;
         return dn;
     }
@@ -260,9 +267,11 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 //
 //        return (borderCrossCount%2) == 1;
     }
-    
+
     public boolean areNeighbours(DotNode dn1, DotNode dn2){
-        return dn1.next == dn2 || dn2.next == dn1;
+        return dn1.next == dn2 || dn2.next == dn1
+                || (dn1.next == null && dn2 == this.dotNode)
+                || (dn2.next == null && dn1 == this.dotNode);
     }
 
     private boolean isCrossing(DotNode prevDn, DotNode dn){
@@ -313,7 +322,22 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return fromDnc;
     }
 
+
+
     public void cutBase(DotNode firstDnc, Base base){
+        System.out.println(" Cycle:");
+        DotNode dnc = this.getDotNode();
+        while (dnc!=null){
+            System.out.println("x:" + dnc.d.getX()+" y:" + dnc.d.getY());
+            dnc = dnc.next;
+        }
+        System.out.println(" Base being cut:");
+        DotNode dnbb = base.getDotNode();
+        while (dnbb!=null){
+            System.out.println("x:" + dnbb.d.getX()+" y:" + dnbb.d.getY());
+            dnbb = dnbb.next;
+        }
+
 
         DotNode firstDnb = base.getCycle().findDnWithDot(firstDnc.d);
 
@@ -362,12 +386,12 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return dn.next;
     }
 
-    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc, LinkedList<Dot> oldPath){
+    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc, LinkedList<DotNode> oldPath){
         DotNode dn = fDnc;
         while (dn.next.d != lDotnc){
             dn = dn.next;
             dotsSet.remove(dn.d);
-            oldPath.addLast(dn.d);
+            oldPath.addLast(dn);
         }
         return dn.next;
     }

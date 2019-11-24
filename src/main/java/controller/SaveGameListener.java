@@ -4,15 +4,14 @@ import main.java.model.Settings;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SaveGameListener extends AbstractAction {
     private JFrame saveFrame;
     private JTextField textField;
-    private String directoryPath = "src/main/saves/";
+    private String directoryPath = new File("").getAbsolutePath()+"/";
 
     public SaveGameListener(JFrame saveFrame, JTextField textField) {
         this.saveFrame = saveFrame;

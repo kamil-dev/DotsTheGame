@@ -21,18 +21,6 @@ public class DotNode implements Serializable {
         if (dn2 == null)
             return false;
         return this.d.equals(dn2.d);
-//        if( this.d.equals(dn2.d)){
-//            if (this.next == null)
-//            {
-//                if (dn2.next == null)
-//                    return true;
-//                return false;
-//            }
-//            if(dn2.next == null)
-//                return false;
-//            return this.next.d.equals(dn2.next.d);
-//        }
-//        return false;
     }
 
     public int getY(){
