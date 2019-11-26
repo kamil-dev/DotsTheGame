@@ -97,19 +97,20 @@ public class BoardFrame extends JFrame {
         playerOneLabel.setText(settings.getP1().getName());
         playerOneLabel.setFont(font);
         playerOneLabel.setForeground(settings.getP1().getColor());
-        playerOneLabel.setBounds(20,20, 100,25);
+        playerOneLabel.setBounds(10,20, 100,25);
 
         JLabel playerTwoLabel = new JLabel();
         playerTwoLabel.setText(settings.getP2().getName());
         playerTwoLabel.setFont(font);
         playerTwoLabel.setForeground(settings.getP2().getColor());
-        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 120,20, 100,25);
+        playerTwoLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 110,20, 100,25);
         playerTwoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         scoreLabel.setForeground(foregroundColor);
         scoreLabel.setFont(settings.getGlobalTheme().getFontLarge());
         scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
-        scoreLabel.setBounds(130,20, 60,20);
+        scoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        scoreLabel.setBounds(100,20, 100,20);
 
         JLabel loadLabel = new JLabel();
         loadLabel.setForeground(foregroundColor);
@@ -138,7 +139,7 @@ public class BoardFrame extends JFrame {
          try {
              BufferedImage clockIcon = ImageIO.read(new File("src\\main\\resources\\iconfinder_time_clock_107185.png"));
              JLabel clockLabel = new JLabel(new ImageIcon(clockIcon.getScaledInstance(60,60,Image.SCALE_SMOOTH)));
-             clockLabel.setBounds(125,40, 60,60);
+             clockLabel.setBounds(120,40, 60,60);
              infoPanel.add(clockLabel);
          } catch (IOException e) {
              System.err.println("The clock icon could not be read");
@@ -150,7 +151,7 @@ public class BoardFrame extends JFrame {
         playerOneTimerLabel.setText(timerIntoString(settings.getP1().getRemainingTime()));
         playerOneTimerLabel.setFont(timerFont);
         playerOneTimerLabel.setForeground(settings.getP1().getColor());
-        playerOneTimerLabel.setBounds(20,60, 120,20);
+        playerOneTimerLabel.setBounds(10,60, 120,20);
 
         timer = new Timer(1000, new ClockListener());
         timer.start();
@@ -159,7 +160,7 @@ public class BoardFrame extends JFrame {
         playerTwoTimerLabel.setText(timerIntoString(settings.getP2().getRemainingTime()));
         playerTwoTimerLabel.setFont(timerFont);
         playerTwoTimerLabel.setForeground(settings.getP2().getColor());
-        playerTwoTimerLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 140,60, 120,20);
+        playerTwoTimerLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 130,60, 120,20);
         playerTwoTimerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         infoPanel.add(playerOneLabel);
