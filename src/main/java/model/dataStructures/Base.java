@@ -16,7 +16,6 @@ public class Base implements ICycle, Serializable {
         this.cycle = c;
         this.board = b;
         this.ownerId = ownerId;
-        this.pointsCount = countPoints();
     }
 
     public DotNode getNext(DotNode dn){
@@ -42,17 +41,6 @@ public class Base implements ICycle, Serializable {
         return this.getCycle().doesContainACycle(cycle);
     }
 
-    private int countPoints(){
-        int pointsCount = 0;
-        for(int i = this.cycle.getXmin(); i<=this.cycle.getXmax(); i++)
-            for(int j = this.cycle.getYmin(); j <= this.cycle.getYmax(); j++) {
-                Dot d = board.getDot(i,j);
-                if ( d!=null && (this.contains(d) || this.hasInside(d)) )
-                    pointsCount++;
-            }
-        return pointsCount;
-    }
-
     public Cycle getCycle() {
         return cycle;
     }
@@ -72,21 +60,6 @@ public class Base implements ICycle, Serializable {
     public DotNode getDotNodeWithDot(Dot d) {
         return this.cycle.getDotNodeWithDot(d);
     }
-//    public int getXmin() {
-//        return cycle.getXmin();
-//    }
-//
-//    public int getXmax() {
-//        return cycle.getXmax();
-//    }
-//
-//    public int getYmin() {
-//        return cycle.getYmin();
-//    }
-//
-//    public int getYmax() {
-//        return cycle.getYmax();
-//    }
 
     public int getPointsCount() {
         return pointsCount;

@@ -1,7 +1,7 @@
 package main.java.model.dataStructures;
 
 public interface ICycle {
-    public boolean contains(Dot d);
-    public boolean hasInside(Dot d);
-    public boolean hasOutside(Dot d);
+    boolean contains(Dot d);
+    boolean hasInside(Dot d);
+    boolean hasOutside(Dot d);
 }

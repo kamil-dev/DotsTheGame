@@ -15,7 +15,7 @@ public class Board implements Serializable {
     private int dotNb = 1;
     private Set<Dot> freeDotSpaces = new HashSet<>();
 
-    private int activePlayer = 0; //  opposing player nb is: 1 - activePlayer
+    private int activePlayer = 0; //  opposing player_nb equals to: 1 - activePlayer
     private int[] pointsPlayer = new int[2];
 
     private Set<Cycle>[] cyclesOfPlayers = new Set[2];
@@ -33,7 +33,6 @@ public class Board implements Serializable {
                 freeDotSpaces.add(new Dot(i,j,-1));
             }
         }
-        //this.freeDotSpacesCount = size * size;
         this.activePlayer = 0;
 
     }
@@ -49,7 +48,6 @@ public class Board implements Serializable {
     public void addDot(Dot d, boolean isDrawable){
         if(!isPlacingADotPossible(d))
             return;
-        System.out.println("Added dot:"+ d.getX()+","+d.getY());
         matrixOfDots[d.getX()][d.getY()] = d;
         this.freeDotSpaces.remove(d);
         this.dotNb++;
@@ -57,11 +55,7 @@ public class Board implements Serializable {
         Cycle newCycle = aNewCycleCreatedByDot(d);
         if (newCycle != null) {
             extendCycle(newCycle);
-            System.out.println("extended cycle:");
-            newCycle.printCycle();
             shrinkCycleToBordersWithBases(newCycle);
-            System.out.println("shrank to bases:");
-            newCycle.printCycle();
             if (newCycle.contains(d)) {
                 replaceOldCyclesWithANewOne(newCycle, activePlayer);
                 if (isBase(newCycle, d, activePlayer)) {
@@ -95,7 +89,6 @@ public class Board implements Serializable {
         }
         if(baseCreated) {
             updatePoints();
-            System.out.println("Current score:" + this.pointsPlayer[0]+ "-" + this.pointsPlayer[1]);
         }
         this.activePlayer = 1 - this.activePlayer;
     }
@@ -139,12 +132,6 @@ public class Board implements Serializable {
         AtomicInteger pathIndex = new AtomicInteger(0);
         HashSet<Dot> visited = new HashSet<>();
         if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, ownerId)){ // find path from addedDot to addedDot i.e. a cycle
-            System.out.println("cycle found!");
-            for (int i = 0; i< pathIndex.get(); i++){
-                Dot ddd = path[i];
-                System.out.println(""+ddd.getX() +", " + ddd.getY());
-            }
-            System.out.println("end of cycle");
             return new Cycle(this, ownerId, path, pathIndex);
         }
         return null;
@@ -160,11 +147,6 @@ public class Board implements Serializable {
         visited.addAll(firstCycle.getDotsSet());
         visited.remove(addedDot);
         if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, ownerId)){  // find path from addedDot to addedDot i.e. a cycle
-            System.out.println("second cycle found!");
-            for (int i = 0; i< pathIndex.get(); i++){
-                Dot ddd = path[i];
-                System.out.println(""+ddd.getX() +", " + ddd.getY());
-            }
             return new Cycle(this, ownerId, path,pathIndex);
         }
         return null;
@@ -173,11 +155,10 @@ public class Board implements Serializable {
     /* Method finds path from currentDot to toDot
        path is stored in path[]
        where path[0] is a starting dot
-       path[pathIndex.get()-1] is the last dot on path (to Dot)
+       path[pathIndex.get()-1] is the last dot on path (including toDot)
      */
     private boolean findCyclePath(Dot currentDot, Dot toDot, int xmin, int xmax, int ymin, int ymax,
                                   Dot[] path, AtomicInteger pathIndex, Set<Dot> visited, int ownerId){
-        //System.out.println(" " +currentDot.getX() +" " + currentDot.getY());
 
         if ( currentDot.equals(toDot)) {
             if (pathIndex.get()!= 0) {        // check for not allowing a neighbor to come back to toDot at start
@@ -238,17 +219,10 @@ public class Board implements Serializable {
         DotNode dn = cycle.getDotNode();
         int ownerId = cycle.getDotNode().d.getOwnerId();
         while (dn != null){
-            Dot[] path = new Dot[(dotNb+1)/2]; // size == nb of player's dots
+            Dot[] path = new Dot[(dotNb+1)/2]; // size == nb of dots on the board
             AtomicInteger pathIndex = new AtomicInteger(0);
             HashSet<Dot> visited = new HashSet<>();
             if(findPathExtendingCycle(cycle, dn.d, path, pathIndex, visited, ownerId)) {
-
-                System.out.println(" From node:" + path[0].getX()+"'" + path[0].getY());
-                System.out.println(" Replacement Path:");
-                for(int i = 0 ; i < pathIndex.get(); i++){
-                    Dot d = path[i];
-                    System.out.println("x:" + d.getX()+" y:" + d.getY());
-                }
                 Dot lastDot = path[pathIndex.get()-1];
                 LinkedList<DotNode> oldPath = cycle.replacePath(dn, path, pathIndex.get());
                 if(oldPath.size() > 0) {
@@ -262,8 +236,6 @@ public class Board implements Serializable {
                     }
                     if(!hasInsideAnyOfOldDots){
                         DotNode lastDn = cycle.findDnWithDot(lastDot);
-//                        dn.next = oldPath.getFirst().next;
-//                        //if(lastDn.next == null)
                         while ( oldPath.size()>0){
                             lastDn = lastDn.next = new DotNode(oldPath.removeLast().d,null);
                         }
@@ -356,23 +328,12 @@ public class Board implements Serializable {
 
         while (dn != null){
             basesContainingD = getBasesFromASetContainingDot(dn.d, bases);
-            //System.out.println("Bases of player" + activePlayer + " count:" + bases.size());
             boolean baseDeleted = false;
             for(Base base: basesContainingD){
                 if(base != null && dn.next!=null && base.contains(dn.next.d) && cycle.doesContainACycle(base.getCycle())) {
                     baseDeleted = true;
-//                    System.out.println("player"+activePlayer+" cut base:");
-//                    base.getCycle().printCycle();
-//                    for(Dot d : base.getCycle().getDotsSet())
-//                        System.out.println("d"+d.getX()+" " +d .getY());
-//                    System.out.println("from cycle:");
-//                    cycle.printCycle();
                     cycle.cutBase(dn, base);
-//                    System.out.println("Cycle after cut:");
-//                    cycle.printCycle();
-//                    for(Dot d : cycle.getDotsSet())
-//                        System.out.println("d.x:" + d.getX()+" d.y:"+d.getY());
-                    bases.remove(base); // to nie koniecznie musi byc zawsze poprawne
+                    bases.remove(base);
                 }
             }
             if(!baseDeleted)
@@ -401,11 +362,9 @@ public class Board implements Serializable {
     /// CREATE BASE
 
     private Base createBase(Cycle cycle, int baseOwner) {
-        System.out.println("Base created!");
-        cycle.printCycle();
         cyclesOfPlayers[activePlayer].remove(cycle);
         Base newBase = new Base(cycle, this, baseOwner);
-        for (int playerId = 0; playerId < 2; playerId++) {                     // delete surrounded Bases and Cycles
+        for (int playerId = 0; playerId < 2; playerId++) {           // delete surrounded Bases and Cycles
             Set<Cycle> cyclesOfPlayer = cyclesOfPlayers[playerId];
             Set<Cycle> cyclesToRemove = new HashSet<>();
             for (Cycle c : cyclesOfPlayer) {
@@ -443,10 +402,6 @@ public class Board implements Serializable {
             }
         newBase.setPointsCount(pointsCount);
         basesOfPlayers[baseOwner].add(newBase);
-        System.out.println( "playerBaseCount: " + basesOfPlayers[baseOwner].size());
-        //for(int i = 0; i<basesOfPlayers)
-        // policz punkty: wersja ambitna lub (malo kosztowny) brute force: zlicz pkty z baz kazdego z graczy
-        System.out.println(""+ freeDotSpaces.size() +" remain free");
         return newBase;
     }
 
@@ -578,11 +533,6 @@ public class Board implements Serializable {
         return true;
     }
 
-    private int findDotIndInPath(Dot d, Dot[] path, AtomicInteger pathIndex){
-
-        return -1;
-    }
-
     private List<Base> getBasesFromASetContainingDot(Dot d, Set<Base> bases){
         LinkedList<Base> basesList = new LinkedList<>();
         for (Base b : bases){
@@ -604,13 +554,6 @@ public class Board implements Serializable {
         return false;
     }
 
-    private Cycle getCycleContainingDotFromASet(Dot dot, Set<Cycle> cycles) {
-        for(Cycle c: cycles)
-            if (c.contains(dot))
-                return c;
-        return null;
-    }
-
     private Cycle getCycleFromASetHavingADotInside(Dot dot, Set<Cycle> cycles) {
         for(Cycle c: cycles)
             if (c.hasInside(dot))
@@ -618,15 +561,6 @@ public class Board implements Serializable {
         return null;
     }
 
-    private Base getBaseContainingDot(Dot d){
-        int x = d.getX();
-        int y = d.getY();
-        for (Base b : basesOfPlayers[activePlayer]) {
-            if(b.contains(d))
-                return b;
-        }
-        return null;
-    }
 
     private Cycle getAnEmptyOpponentCycleContainingDot(Dot dot, int activePlayer){
         return getCycleFromASetHavingADotInside(dot, cyclesOfPlayers[1-activePlayer]);
@@ -642,9 +576,6 @@ public class Board implements Serializable {
         }
         Settings.gameSettings.getP1().setPoints(this.pointsPlayer[0]);
         Settings.gameSettings.getP2().setPoints(this.pointsPlayer[1]);
-        System.out.println("Update activated");
-        System.out.println(Settings.gameSettings.getP1().getPoints() + " : " + Settings.gameSettings.getP2().getPoints());
-
     }
 
     /// AUXILIARY METHODS
@@ -673,14 +604,10 @@ public class Board implements Serializable {
             else nextD = sortedListOfDotsWithinACycle.get(0);
 
             d = sortedListOfDotsWithinACycle.get(i);
-            //System.out.println("current dot: " + d.toString());
-            //System.out.println("previous dot: " + previousD.toString());
-            //System.out.println("next dot: " + nextD.toString());
             board[d.getX()][d.getY()].addConnection(previousD);
             board[d.getX()][d.getY()].addConnection(nextD);
             board[d.getX()][d.getY()].repaint();
         }
-
     }
 }
 

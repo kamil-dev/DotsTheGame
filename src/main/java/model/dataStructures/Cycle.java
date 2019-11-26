@@ -10,18 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Cycle implements ICycle, Cloneable, Serializable {
     private Board board;
-    private int ownerId;            //xmin i xmax beda mi potrzebne tylko do tworzenia cyklu (do ominiecia pustych prostych cykli
+    private int ownerId;
     private int xmin = Integer.MAX_VALUE;
     private int xmax = 0;
     private int ymin = Integer.MAX_VALUE;
     private int ymax = 0;
 
     private HashSet<Dot> dotsSet = new HashSet<>();
-    private DotNode dotNode;                            // last dotNode.next == null to mark the end of cycle
+    private DotNode dotNode;        // last dotNode.next == null to mark the end of cycle
 
-    // condition for a circle to have at least one Dot inside
-    //      xmax - xmin >= 2
-    //      ymax - ymin >= 2
     public Cycle(Board board, int ownerId, Dot[] path, AtomicInteger pathIndex){
         this.board = board;
         this.ownerId = ownerId;
@@ -49,24 +46,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return this.dotNode;
     }
 
-    private DotNode addDotToCyclesDataStructures(Dot d){
-        DotNode dncNew = new DotNode(d, null);
-        dotsSet.add(d);
-        return dncNew;
-    }
-
-    private DotNode addDotToCyclesDataStructures(Dot d, DotNode next){
-        DotNode dncNew = addDotToCyclesDataStructures(d);
-        dncNew.next = next;
-        return dncNew;
-    }
-
-    private DotNode addDotToCyclesDataStructures(DotNode prev, Dot d){
-        DotNode dncNew = addDotToCyclesDataStructures(d);
-        prev.next = dncNew;
-        return dncNew;
-    }
-
 
     // assumption of order guarantee:
     //      we have a guarantee that toDot is next from fromDot in Board::extendCycle
@@ -74,7 +53,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
     public LinkedList<DotNode> replacePath(DotNode firstDn, Dot[] path, int pathIndex)
     {
         Dot toDot =  path[--pathIndex];
-        System.out.println("replace path TO DOT:" + toDot.getX() +"," + toDot.getY());
 
         LinkedList<DotNode> oldPath = new LinkedList<>();
         DotNode toDotDn = deleteOldPath(firstDn, toDot, oldPath);
@@ -87,8 +65,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         }
         dn.next = toDotDn;
 
-        System.out.println("cycle after replace path");
-        printCycle();
         this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
         return oldPath;
     }
@@ -132,13 +108,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return dn;
     }
 
-    public DotNode getLastDn(){
-        DotNode dn = this.getDotNode();
-        while (dn.next != null)
-            dn = dn.next;
-        return dn;
-    }
-
     public boolean doesOverlapWithCycleOrDoesContainIt(Cycle c) {
         int commonDotsCount = 0;
         for (Dot d : c.dotsSet) {
@@ -159,8 +128,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return false;
     }
 
-
-
     public boolean doesContainACycle(Cycle c){
         for(Dot d : c.getDotsSet()){
             if (this.hasOutside(d))
@@ -173,41 +140,11 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return dotsSet.contains(d);
     }
 
-    // Dot d is inside a cirle if on its x coordinate there is an odd number of circle Dots cd with
-    // cd.getX() < d.getX()
-    // with an exception:
-    // when (d.getX()== xmin || d.getX()== xmax) dot is never inside a circle
+    // Dot d is inside a circle if on d.getX() coordinate cycle contains
+    //      an odd number cutting through the circle border inside or outside the circle
+    // The check is performed by Cycle::isCrossing(DotNode prevDn, DotNode dn)
     public boolean hasInside(Dot d) {
-//        if (dotsSet.contains( d))
-//            return false;
-//        int x = d.getX();
-//        int y = d.getY();
-//
-//        boolean northDn = false;
-//        boolean southDn = false;
-//        boolean eastDn = false;
-//        boolean westDn = false;
-//
-//
-//        DotNode dn = this.dotNode;
-//
-//        while (dn != null){
-//            if (dn.getX() == x)
-//            {
-//                if(dn.getY() < y)
-//                    westDn = true;
-//                else
-//                    eastDn = true;
-//            }
-//            if(dn.getY() == y){
-//                if(dn.getX() < x)
-//                    northDn = true;
-//                else
-//                    southDn = true;
-//            }
-//            dn = dn.next;
-//        }
-//        return northDn && eastDn && westDn && southDn;
+
         if (this.contains(d))
             return false;
         if (this.getXmax() - this.getXmin() < 2 || this.getYmax() - this.getYmin() < 2)
@@ -236,36 +173,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         }while (prevDnc != stopDn);
 
         return (borderCrossCount%2) == 1;
-
-
-//        int x = d.getX();
-//
-//        LinkedList<DotNode> dnsOnX = dotsHorrizontally.get(x);
-//        if(dnsOnX == null || dnsOnX.size() == 0)
-//            return false;
-//
-//        DotNode dn, prevDn, nextOnList;
-//        dn = dnsOnX.get(0);
-//        prevDn = this.dotNode;
-//        while (prevDn.next != null && dn != prevDn.next ){
-//            prevDn = prevDn.next;
-//        }
-//
-//        int borderCrossCount = 0;
-//        int i = 1;
-//        while (i< dnsOnX.size()){
-//            while (i< dnsOnX.size() -1 && x == (nextOnList = dnsOnX.get(i+1)).getX() && areNeighbours(nextOnList, dn) ) {
-//                dn = nextOnList;
-//                i++;
-//            }
-//            if(areOpposite(prevDn,dn))
-//                borderCrossCount++;
-//
-//            prevDn = dn;
-//            dn = dnsOnX.get(i++);
-//        }
-//
-//        return (borderCrossCount%2) == 1;
     }
 
     public boolean areNeighbours(DotNode dn1, DotNode dn2){
@@ -291,50 +198,17 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return prevDn;
     }
 
-//    private boolean areOpposite(DotNode prevDn, DotNode dn){
-//        DotNode nextDn = dn.next!= null ? dn.next : this.dotNode;
-//        return ( prevDn.getX() < dn.getX() && dn.getX() < nextDn.getX() )
-//                ||
-//                (prevDn.getX() > dn.getX() && dn.getX() > nextDn.getX());
-//    }
-//    //private boolean didCross()
-
     public boolean hasOutside(Dot d) {
         return !dotsSet.contains(d) && !hasInside(d);
     }
 
-    // returns next DotNode
-    private DotNode removeDotNodeFromCyclesDataStructures(DotNode dotNode){
-        Dot d = dotNode.d;
-        System.out.println("dot "+d.getX()+','+d.getY()+"dot delete successful: " + dotsSet.remove(d));
-        return dotNode.next;
-    }
-
-    //including DotNode excluding Dot
-    private DotNode removePathFromDotNodeUntilDot(DotNode fromDnc, Dot toDot){
-        while (!fromDnc.d.equals(toDot)) {     // remove old path dots from cycle  //
-            removeDotNodeFromCyclesDataStructures(fromDnc);
-            System.out.println("ttuu");
-            if(fromDnc.next == null)
-                return fromDnc;
-            fromDnc = fromDnc.next;
-        }
-        return fromDnc;
-    }
-
-
-
     public void cutBase(DotNode firstDnc, Base base){
-        System.out.println(" Cycle:");
         DotNode dnc = this.getDotNode();
         while (dnc!=null){
-            System.out.println("x:" + dnc.d.getX()+" y:" + dnc.d.getY());
             dnc = dnc.next;
         }
-        System.out.println(" Base being cut:");
         DotNode dnbb = base.getDotNode();
         while (dnbb!=null){
-            System.out.println("x:" + dnbb.d.getX()+" y:" + dnbb.d.getY());
             dnbb = dnbb.next;
         }
 
@@ -350,14 +224,14 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         }
 
         DotNode firstDnbNext = base.getNext(firstDnb);
-        DotNode firstDncNext =  firstDnc.next ; // firstDnc.next musi istniec w przeciwnym wypadku bledne wywolanie
+        DotNode firstDncNext =  firstDnc.next ;     // firstDnc.next has to exist checked - invocation check required
 
         deleteOldPath(firstDnc,lastDncOnBase);
 
-        if (firstDnbNext.d != firstDncNext.d) {     // base cycle goes in an opposite direction - cool
+        if (firstDnbNext.d != firstDncNext.d) {     // base and cycle go in an opposite direction
             addNewPath(firstDnc,firstDnbNext,lastDncOnBase,base);
         }
-        else {
+        else {  // base and cycle go in the same direction
             DotNode dnb = firstDnbNext;
             while (!dnb.equals(lastDncOnBase)){
                 dnb = base.getNext(dnb);
@@ -366,8 +240,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 
             addNewPathReverse(lastDncOnBase, lastDnbOnCycle, firstDnc, base);
         }
-
-        //this.recomputeMinAndMaxCoordinatesAndResetDotsSet();
     }
 
     private void deleteOldPath(DotNode fDnc, DotNode lDnc){
@@ -376,14 +248,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
             dn = dn.next;
             dotsSet.remove(dn.d);
         }
-    }
-    private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc){
-        DotNode dn = fDnc;
-        while (dn.next.d != lDotnc){
-            dn = dn.next;
-            dotsSet.remove(dn.d);
-        }
-        return dn.next;
     }
 
     private DotNode deleteOldPath(DotNode fDnc, Dot lDotnc, LinkedList<DotNode> oldPath){
@@ -438,8 +302,6 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         }
         return null;
     }
-
-
 
     public int getXmin() {
         return xmin;

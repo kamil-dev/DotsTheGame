@@ -9,7 +9,7 @@ public class Dot implements Serializable {
     private int ownerId;
     private boolean isInsideBase;
 
-        // max size of a board ensuring unique hashcodes set to 1000
+        // max size of a board ensuring unique hashcodes: 1000
     public Dot(int x, int y, int ownerId) {
         this.x = x;
         this.y = y;
@@ -17,7 +17,6 @@ public class Dot implements Serializable {
         this.ownerId = ownerId;
         isInsideBase = false;
     }
-
 
     public int getX() {
         return x;
