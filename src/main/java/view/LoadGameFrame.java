@@ -12,7 +12,7 @@ import java.awt.*;
 import java.io.File;
 
 public class LoadGameFrame extends JFrame {
-    private static final String PATH = "src/main/saves";
+    private static final String PATH = new File("").getAbsolutePath()+"/";
     private int width = 500;
     private int height = 525;
 
