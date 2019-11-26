@@ -111,6 +111,14 @@ public class BoardFrame extends JFrame {
         scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
         scoreLabel.setBounds(130,20, 60,20);
 
+        JLabel loadLabel = new JLabel();
+        loadLabel.setForeground(foregroundColor);
+        loadLabel.setFont(font);
+        loadLabel.setText("Load Game");
+        loadLabel.addMouseListener(new NavigateMouseListener(loadLabel, this));
+        loadLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        loadLabel.setBounds((int)infoPanel.getPreferredSize().getWidth() - 160,(int)infoPanel.getPreferredSize().getHeight() - 110, 140,25);
+
         JLabel saveLabel = new JLabel();
         saveLabel.setForeground(foregroundColor);
         saveLabel.setFont(font);
@@ -130,7 +138,7 @@ public class BoardFrame extends JFrame {
          try {
              BufferedImage clockIcon = ImageIO.read(new File("src\\main\\resources\\iconfinder_time_clock_107185.png"));
              JLabel clockLabel = new JLabel(new ImageIcon(clockIcon.getScaledInstance(60,60,Image.SCALE_SMOOTH)));
-             clockLabel.setBounds(120,40, 60,60);
+             clockLabel.setBounds(125,40, 60,60);
              infoPanel.add(clockLabel);
          } catch (IOException e) {
              System.err.println("The clock icon could not be read");
@@ -161,6 +169,7 @@ public class BoardFrame extends JFrame {
         infoPanel.add(scoreLabel);
         infoPanel.add(resignLabel);
         infoPanel.add(saveLabel);
+        infoPanel.add(loadLabel);
 
     }
 

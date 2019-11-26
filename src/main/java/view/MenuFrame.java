@@ -52,13 +52,13 @@ public class MenuFrame extends JFrame {
         }
 
         JLabel play = new JLabel();
-        play.setText("      Play");
+        play.setText("     Play");
         play.setFont(font);
         play.addMouseListener(new NavigateMouseListener(play,this));
         play.setForeground(foregroundColor);
 
         JLabel loadGame = new JLabel();
-        loadGame.setText("Load Game");
+        loadGame.setText(" Load Game");
         loadGame.setFont(font);
         loadGame.addMouseListener(new NavigateMouseListener(loadGame,this));
         loadGame.setForeground(foregroundColor);

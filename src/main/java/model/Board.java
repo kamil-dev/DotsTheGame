@@ -38,11 +38,15 @@ public class Board implements Serializable {
 
     }
 
+    public void addDot(Dot d){
+        addDot(d, true);
+    }
+
     public void addDot(int x, int y){
         addDot(new Dot(x,y,activePlayer));
     }
 
-    public void addDot(Dot d){
+    public void addDot(Dot d, boolean isDrawable){
         if(!isPlacingADotPossible(d))
             return;
         System.out.println("Added dot:"+ d.getX()+","+d.getY());
@@ -63,7 +67,7 @@ public class Board implements Serializable {
                 if (isBase(newCycle, d, activePlayer)) {
                     Base base = createBase(newCycle, activePlayer);
                     basesOfPlayers[activePlayer].add(base);
-                    drawBase(base);
+                    if (isDrawable) drawBase(base);
                     baseCreated = true;
                 }
                 newCycle = aSecondCycleCreatedByDot(d, newCycle);        // case of the second cycle created by dot
@@ -75,7 +79,7 @@ public class Board implements Serializable {
                         if (isBase(newCycle, d, activePlayer)) {
                             Base base = createBase(newCycle, activePlayer);
                             basesOfPlayers[activePlayer].add(base);
-                            drawBase(base);
+                            if (isDrawable) drawBase(base);
                             baseCreated = true;
                         }
                     }
@@ -86,7 +90,7 @@ public class Board implements Serializable {
                 null != (newCycle = getAnEmptyOpponentCycleContainingDot(d, activePlayer))
         ) {
             Base base = createBase(newCycle, 1 - activePlayer);
-            drawBase(base);
+            if (isDrawable)drawBase(base);
             baseCreated = true;
         }
         if(baseCreated) {
@@ -95,9 +99,6 @@ public class Board implements Serializable {
         }
         this.activePlayer = 1 - this.activePlayer;
     }
-
-
-
 
 
     public int getSize() {
@@ -127,9 +128,6 @@ public class Board implements Serializable {
     public void setMatrixOfDots(Dot[][] b){
         this.matrixOfDots = b;
     }
-
-
-
 
     /// A NEW CYCLE CREATED SECTION
 
@@ -650,9 +648,6 @@ public class Board implements Serializable {
     }
 
     /// AUXILIARY METHODS
-
-
-
 
     private static void drawBase(Base base){
         Cycle cycleToDraw = base.getCycle();

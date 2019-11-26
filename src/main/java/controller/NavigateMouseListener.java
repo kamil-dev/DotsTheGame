@@ -73,7 +73,7 @@ public class NavigateMouseListener implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        label.setFont(new Font("Arial",Font.BOLD,22));
+        label.setFont(new Font("Comic Sans MS",Font.BOLD,22));
     }
 
     @Override

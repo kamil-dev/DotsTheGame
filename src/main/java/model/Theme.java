@@ -10,8 +10,8 @@ public class Theme implements Serializable {
     private Font fontNormal;
 
     public Theme() {
-        this(new Color(204, 204, 255), new Color(0, 51, 153), new Font("Arial",Font.BOLD,20),
-                new Font("Arial",Font.PLAIN,16));
+        this(new Color(204, 204, 255), new Color(0, 51, 153), new Font("Comic Sans MS",Font.BOLD,20),
+                new Font("Comic Sans MS",Font.PLAIN,16));
     }
 
     public Theme(Color backgroundColor, Color foregroundColor, Font fontLarge, Font fontNormal) {

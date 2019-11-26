@@ -20,7 +20,7 @@ public class EndFrame extends JFrame {
     private Font font;
 
     public EndFrame(Player winner, EndGameCause cause){
-        font = new Font("Arial",Font.BOLD,16);
+        font = new Font("Comic Sans MS",Font.BOLD,16);
         foregroundColor = Settings.gameSettings.getGlobalTheme().getForegroundColor();
         backgroundColor = Settings.gameSettings.getGlobalTheme().getBackgroundColor();
         setIconImage(new ImageIcon("src/main/resources/1320183166943884936_128.png").getImage());

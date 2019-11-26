@@ -14,7 +14,8 @@ import java.io.IOException;
 public class SettingsFrame extends JFrame {
     private int width = 500;
     private int height = 525;
-    private Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.WHITE, Color.BLACK, Color.CYAN};
+    private Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA, Color.WHITE, Color.BLACK, Color.CYAN,
+                new Color(102, 153, 0), new Color(204, 0, 204), new Color(0, 153, 204)};
     private JTextField boardSizeTextField, playerOneNameTextField, playerTwoNameTextField;
     private JSpinner hoursSpinner, minutesSpinner, secondsSpinner;
     private JComboBox<Color> playerOneComboBox, playerTwoComboBox;
@@ -98,16 +99,16 @@ public class SettingsFrame extends JFrame {
         JLabel boardSizeLabel = new JLabel("Board Size:");
         boardSizeLabel.setForeground(foregroundColor);
         boardSizeLabel.setFont(fontNormal);
-        boardSizeLabel.setBounds(50,height - 140,100,20);
+        boardSizeLabel.setBounds(50,height - 140,120,20);
 
         boardSizeTextField = new JTextField();
-        boardSizeTextField.setBounds(160,height - 140,50,20);
+        boardSizeTextField.setBounds(180,height - 140,50,20);
         boardSizeTextField.setToolTipText("Type in an integer between 10 and 40");
 
         JLabel timerLabel = new JLabel("Timer (h.m.s):");
         timerLabel.setForeground(foregroundColor);
         timerLabel.setFont(fontNormal);
-        timerLabel.setBounds(50,height - 100,100,20);
+        timerLabel.setBounds(50,height - 100,120,20);
 
 //        timerTextField = new JTextField();
 //        timerTextField.setBounds(160,height - 100,50,20);
@@ -115,27 +116,27 @@ public class SettingsFrame extends JFrame {
 
         hoursSpinner = new JSpinner(new SpinnerNumberModel(0,0,10,1));
         hoursSpinner.setToolTipText("Hours");
-        hoursSpinner.setBounds(160,height-100, 35,20);
+        hoursSpinner.setBounds(180,height-100, 35,20);
         minutesSpinner = new JSpinner(new SpinnerNumberModel(30,0,59,1));
         minutesSpinner.setToolTipText("Minutes");
-        minutesSpinner.setBounds(205,height-100, 35,20);
+        minutesSpinner.setBounds(225,height-100, 35,20);
         secondsSpinner = new JSpinner(new SpinnerNumberModel(0,0,59,1));
         secondsSpinner.setToolTipText("Seconds");
-        secondsSpinner.setBounds(250,height-100, 35,20);
+        secondsSpinner.setBounds(270,height-100, 35,20);
 
         JLabel acceptLabel = new JLabel("Accept");
         acceptLabel.setForeground(foregroundColor);
         acceptLabel.setFont(fontLarge);
         acceptLabel.addMouseListener(new NavigateMouseListener(acceptLabel, this));
         acceptLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        acceptLabel.setBounds(width - 150,height - 140, 100,20);
+        acceptLabel.setBounds(width - 150,height - 140, 100,25);
 
         JLabel cancelLabel = new JLabel("Cancel");
         cancelLabel.setFont(fontLarge);
         cancelLabel.setForeground(foregroundColor);
         cancelLabel.addMouseListener(new NavigateMouseListener(cancelLabel, this));
         cancelLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        cancelLabel.setBounds(width - 150,height - 100, 100,20);
+        cancelLabel.setBounds(width - 150,height - 100, 100,25);
 
 
         settingsPanel.add(playerOneLabel);
