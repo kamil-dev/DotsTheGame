@@ -4,7 +4,7 @@ package main.java.model.dataStructures;
 
 import java.io.Serializable;
 
-public class DotNode implements Serializable {
+public class DotNode implements Serializable, Cloneable {
     public Dot d;
     public DotNode next;
 

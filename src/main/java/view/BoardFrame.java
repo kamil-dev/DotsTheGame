@@ -69,7 +69,7 @@ public class BoardFrame extends JFrame {
                     BoardSquare bs = new BoardSquare(i, j);
                     board[i][j] = bs;
                     boardPanel.add(bs);
-                    bs.addMouseListener(new BoardSquareMouseListener(bs, scoreLabel));
+                    bs.addMouseListener(new BoardSquareMouseListener(bs, scoreLabel, this));
                 }
             }
             settings.setBoardSquares(board);

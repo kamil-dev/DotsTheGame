@@ -1,7 +1,10 @@
 package main.java.controller;
 
+import main.java.model.Player;
 import main.java.model.Settings;
 import main.java.view.BoardSquare;
+import main.java.view.EndFrame;
+import main.java.view.EndGameCause;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -12,11 +15,13 @@ public class BoardSquareMouseListener extends MouseAdapter implements Serializab
     private BoardSquare bs;
     private Settings settings;
     private JLabel scoreLabel;
+    private JFrame boardFrame;
 
-    public BoardSquareMouseListener(BoardSquare bs, JLabel scoreLabel) {
+    public BoardSquareMouseListener(BoardSquare bs, JLabel scoreLabel, JFrame boardFrame) {
         this.bs = bs;
         this.settings = Settings.gameSettings;
         this.scoreLabel = scoreLabel;
+        this.boardFrame = boardFrame;
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -41,5 +46,14 @@ public class BoardSquareMouseListener extends MouseAdapter implements Serializab
         }
         bs.repaint();
         scoreLabel.setText("" + settings.getP1().getPoints() + " : " + settings.getP2().getPoints());
+        if(settings.getBoard().getFreeDotSpaces().size()==0){
+            boardFrame.setVisible(false);
+            Player p = Settings.gameSettings.getP1();
+            Player p2 = Settings.gameSettings.getP2();
+            if(p.getPoints() < p2.getPoints())
+                p = p2;
+            EndFrame endFrame = new EndFrame(p, EndGameCause.NO_AVAILABLE_MOVE );
+        }
+
     }
 }

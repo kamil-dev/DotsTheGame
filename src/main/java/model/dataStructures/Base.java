@@ -64,4 +64,8 @@ public class Base implements ICycle, Serializable {
     public int getPointsCount() {
         return pointsCount;
     }
+
+    public Board getBoard() {
+        return board;
+    }
 }

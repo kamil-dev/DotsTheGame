@@ -2,8 +2,6 @@ package main.java.model;
 
 import main.java.model.dataStructures.*;
 import main.java.view.BoardSquare;
-import main.java.view.EndFrame;
-import main.java.view.EndGameCause;
 
 import java.io.Serializable;
 import java.util.*;
@@ -21,12 +19,16 @@ public class Board implements Serializable {
     private Set<Cycle>[] cyclesOfPlayers = new Set[2];
     private Set<Base>[] basesOfPlayers = new Set[2];
 
+    private Set<BaseGroup>[] baseGroupsOfPlayers = new Set[2];
+
     public Board(int size) {
         this.matrixOfDots = new Dot[size][size];
         this.cyclesOfPlayers[0] = new HashSet<>();
         this.cyclesOfPlayers[1] = new HashSet<>();
         this.basesOfPlayers[0] = new HashSet<>();
         this.basesOfPlayers[1] = new HashSet<>();
+        this.baseGroupsOfPlayers[0] = new HashSet<>();
+        this.baseGroupsOfPlayers[1] = new HashSet<>();
         this.size = size;
         for(int i = 0; i<size ; i++){
             for(int j = 0; j<size; j++){
@@ -34,7 +36,6 @@ public class Board implements Serializable {
             }
         }
         this.activePlayer = 0;
-
     }
 
     public void addDot(Dot d){
@@ -60,7 +61,6 @@ public class Board implements Serializable {
                 replaceOldCyclesWithANewOne(newCycle, activePlayer);
                 if (isBase(newCycle, d, activePlayer)) {
                     Base base = createBase(newCycle, activePlayer);
-                    basesOfPlayers[activePlayer].add(base);
                     if (isDrawable) drawBase(base);
                     baseCreated = true;
                 }
@@ -72,7 +72,6 @@ public class Board implements Serializable {
                         replaceOldCyclesWithANewOne(newCycle, activePlayer);
                         if (isBase(newCycle, d, activePlayer)) {
                             Base base = createBase(newCycle, activePlayer);
-                            basesOfPlayers[activePlayer].add(base);
                             if (isDrawable) drawBase(base);
                             baseCreated = true;
                         }
@@ -122,6 +121,10 @@ public class Board implements Serializable {
         this.matrixOfDots = b;
     }
 
+    public Set<BaseGroup>[] getBaseGroupsOfPlayers() {
+        return baseGroupsOfPlayers;
+    }
+
     /// A NEW CYCLE CREATED SECTION
 
     private Cycle aNewCycleCreatedByDot(Dot addedDot){
@@ -144,7 +147,8 @@ public class Board implements Serializable {
         Dot[] path = new Dot[(dotNb+3)/2];
         AtomicInteger pathIndex = new AtomicInteger(0);
         HashSet<Dot> visited = new HashSet<>();
-        visited.addAll(firstCycle.getDotsSet());
+        for(DotNode dn: firstCycle.getDotsSet())
+            visited.add(dn.d);
         visited.remove(addedDot);
         if (findCyclePath(addedDot,addedDot, x,x,y,y, path, pathIndex, visited, ownerId)){  // find path from addedDot to addedDot i.e. a cycle
             return new Cycle(this, ownerId, path,pathIndex);
@@ -235,7 +239,7 @@ public class Board implements Serializable {
                         }
                     }
                     if(!hasInsideAnyOfOldDots){
-                        DotNode lastDn = cycle.findDnWithDot(lastDot);
+                        DotNode lastDn = cycle.getDotNodeWithDot(lastDot);
                         while ( oldPath.size()>0){
                             lastDn = lastDn.next = new DotNode(oldPath.removeLast().d,null);
                         }
@@ -324,15 +328,15 @@ public class Board implements Serializable {
         DotNode dn = cycle.getDotNode();
         List<Base> basesContainingD;
         int ownerId = cycle.getDotNode().d.getOwnerId();
-        Set<Base> bases = new HashSet<>(basesOfPlayers[ownerId]);
+        Set<Base> bases = new HashSet<>(baseGroupsOfPlayers[ownerId]);
 
         while (dn != null){
             basesContainingD = getBasesFromASetContainingDot(dn.d, bases);
             boolean baseDeleted = false;
             for(Base base: basesContainingD){
-                if(base != null && dn.next!=null && base.contains(dn.next.d) && cycle.doesContainACycle(base.getCycle())) {
+                if(base != null && base.contains(cycle.getNext(dn).d) && cycle.doesContainACycle(base.getCycle())) {
                     baseDeleted = true;
-                    cycle.cutBase(dn, base);
+                    cycle.cutOrAddBase(base);
                     bases.remove(base);
                 }
             }
@@ -376,40 +380,97 @@ public class Board implements Serializable {
                 }
             }
             cyclesOfPlayer.removeAll(cyclesToRemove);
-            Set<Base> basesOfPlayer = basesOfPlayers[playerId];
-            Set<Base> basesToRemove = new HashSet<>();
-            for (Base base : basesOfPlayer){
-                if(newBase.doesContainACycle(base.getCycle()))
-                    basesToRemove.add(base);
+            Set<Base> baseGroupsOfPlayer = basesOfPlayers[playerId];
+            Set<Base> basesGroupsToRemove = new HashSet<>();
+            for (Base baseGroup : baseGroupsOfPlayer){
+                if(newBase.doesContainACycle(baseGroup.getCycle()))
+                    basesGroupsToRemove.add(baseGroup);
             }
-            basesOfPlayer.removeAll(basesToRemove);
+            baseGroupsOfPlayer.removeAll(basesGroupsToRemove);
         }
         int pointsCount = 0;
-        for (int x = cycle.getXmin() + 1; x < cycle.getXmax(); x++)
+        for (int x = cycle.getXmin() + 1; x < cycle.getXmax(); x++) {
             for (int y = cycle.getYmin() + 1; y < cycle.getYmax(); y++) {
                 Dot d = getDot(x, y);
-                if (d == null && newBase.hasInside(d = new Dot(x, y, -1))){
+                if (d == null && newBase.hasInside(d = new Dot(x, y, -1))) {
                     freeDotSpaces.remove(d);
                     Settings.gameSettings.getBoardSquares()[d.getX()][d.getY()].setState(3);
-                }
-                else if(cycle.hasInside(d)) {
+                } else if (cycle.hasInside(d)) {
                     d.markAsInsideBase();
                     if (d.getOwnerId() == baseOwner)
                         pointsCount--;
-                    else if(d.getOwnerId() == 1 - baseOwner)
+                    else if (d.getOwnerId() == 1 - baseOwner)
                         pointsCount++;
                 }
             }
+        }
         newBase.setPointsCount(pointsCount);
-        basesOfPlayers[baseOwner].add(newBase);
+        addANewBaseToBaseGroups(newBase);
         return newBase;
+    }
+
+    /**
+     * Adds a newBase to a neighboring BaseGroup. If it connect 2 or more BoseGroups it forms a single BaseGroup out of them.
+     * A BaseGroup 'baseGroup' is a neighbor of a Base 'base' if it has at least 2 consecutive dots common with the 'base' cycle
+     * @param newBase
+     */
+    private void addANewBaseToBaseGroups(Base newBase){
+        this.basesOfPlayers[newBase.getOwnerId()].add(newBase);
+        Set<BaseGroup> neighboringBaseGroups =
+                findNeighboringBaseGroups(newBase);
+        if(neighboringBaseGroups.size() > 0){
+            Iterator it = neighboringBaseGroups.iterator();
+            BaseGroup outputBaseGrouping = (BaseGroup) it.next();
+            outputBaseGrouping.getCycle().cutOrAddBase(newBase);
+            DotNode dn = newBase.getDotNode();
+            while (dn != null){
+                if(!outputBaseGrouping.contains(dn.d))
+                    dn.d.markAsInsideBase();
+                dn = dn.next;
+            }
+            while (it.hasNext()) {
+                BaseGroup baseGroupToUnion = (BaseGroup) it.next();
+                outputBaseGrouping.getCycle().cutOrAddBase(baseGroupToUnion);
+                this.baseGroupsOfPlayers[newBase.getOwnerId()].remove(baseGroupToUnion);
+            }
+        }
+        else{
+            this.baseGroupsOfPlayers[newBase.getOwnerId()]
+                    .add(new BaseGroup(this, newBase));
+        }
+    }
+
+    private Set<BaseGroup> findNeighboringBaseGroups(Base newBase){
+        Set<BaseGroup> neighboringBaseGroups = new HashSet<>();
+        for( BaseGroup baseGroup : baseGroupsOfPlayers[newBase.getOwnerId()]){
+            if( doBasesNeighbor(baseGroup, newBase)){
+                neighboringBaseGroups.add(baseGroup);
+            }
+        }
+        return neighboringBaseGroups;
+    }
+    /**
+     * A Base firstBase is a neighbor of a Base 'base' if it has at least 2 consecutive Dots common with the Base secondBase.
+     * @param firstBase
+     * @param secondBase
+     * @return The first common DotNode of the firstBase that is common for both bases
+     */
+    private boolean doBasesNeighbor(Base firstBase, Base secondBase){
+        DotNode dn = firstBase.getDotNode();
+        while(dn != null){
+            if(secondBase.contains(dn.d) && secondBase.contains(firstBase.getNext(dn).d)){  // true == they neighbor
+                return true;
+            }
+            dn = dn.next;
+        }
+        return false;
     }
 
     private Cycle shrinkCycleIfItWasReduced(Cycle cycleToBeShrinked, Cycle base){
         Cycle newCycle = null;
-        for(Dot d : cycleToBeShrinked.getDotsSet()){
-            if (base.hasOutside(d))
-                if( null != (newCycle = aNewCycleCreatedByDot(d)) )
+        for(DotNode dn : cycleToBeShrinked.getDotsSet()){
+            if (base.hasOutside(dn.d))
+                if( null != (newCycle = aNewCycleCreatedByDot(dn.d)) )
                     break;
         }
         if(newCycle != null) {
@@ -427,10 +488,10 @@ public class Board implements Serializable {
     private boolean isPlacingADotPossible(Dot d){       // checking if d is a border of a cycle is not needed
         if(matrixOfDots[d.getX()][d.getY()] != null)
             return false;
-        for (Base b: basesOfPlayers[1-activePlayer])
+        for (Base b: baseGroupsOfPlayers[1-activePlayer])
             if ( b.hasInside(d))
                 return false;
-        for (Base b: basesOfPlayers[activePlayer])
+        for (Base b: baseGroupsOfPlayers[activePlayer])
             if ( b.hasInside(d))
                 return false;
         return true;
@@ -440,6 +501,7 @@ public class Board implements Serializable {
         if(!isAvailable_NecessaryCondition(neighbouringDot, visited))
             return false;
         return doesntCutAnEdge(prevDot, neighbouringDot, path, pathIndex, ownerId);
+
     }
 
     private boolean isAvailable_NecessaryCondition(Dot neighbouringDot, Set<Dot> visited){
@@ -468,7 +530,7 @@ public class Board implements Serializable {
     }
 
     private boolean doesntCutTheBaseBorder(Dot prevDot, Dot dot, int ownerId){
-        for(Base base : basesOfPlayers[ownerId]){
+        for(Base base : baseGroupsOfPlayers[ownerId]){
             if (base.contains(prevDot) && base.contains(dot)){
                 if(!areNeighborsInBase(prevDot,dot,base))
                     return false;
@@ -483,6 +545,7 @@ public class Board implements Serializable {
         return base.getCycle().areNeighbours(prevDn,dotDn);
     }
 
+    // main performance issue - need to store Set<DotNode> pathDots? i sciezke jako dotnode? wygodne. Szybkie.
     private boolean doesntCutCurrentPath(Dot prevDot, Dot neighbouringDot, Dot[] path, AtomicInteger pathIndex, int ownerId){
         Dot[] crossPoints = getCrossPoints(prevDot,neighbouringDot,ownerId);
         if(crossPoints != null){
@@ -524,8 +587,8 @@ public class Board implements Serializable {
         Dot[] crossPoints = getCrossPoints(prevDot,neighbouringDot,ownerId);
         if(crossPoints != null){
             if(cycle.contains(crossPoints[0]) && cycle.contains(crossPoints[1])){
-                DotNode crossPoint1Dn = cycle.findDnWithDot(crossPoints[0]);
-                DotNode crossPoint2Dn = cycle.findDnWithDot(crossPoints[1]);
+                DotNode crossPoint1Dn = cycle.getDotNodeWithDot(crossPoints[0]);
+                DotNode crossPoint2Dn = cycle.getDotNodeWithDot(crossPoints[1]);
                 if(cycle.getNext(crossPoint1Dn) == crossPoint2Dn || cycle.getNext(crossPoint2Dn) == crossPoint1Dn)
                     return false;
             }

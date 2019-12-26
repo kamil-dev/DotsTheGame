@@ -16,7 +16,7 @@ public class Cycle implements ICycle, Cloneable, Serializable {
     private int ymin = Integer.MAX_VALUE;
     private int ymax = 0;
 
-    private HashSet<Dot> dotsSet = new HashSet<>();
+    private HashMap<Integer, DotNode> dotsSet = new HashMap<>();
     private DotNode dotNode;        // last dotNode.next == null to mark the end of cycle
 
     public Cycle(Board board, int ownerId, Dot[] path, AtomicInteger pathIndex){
@@ -42,7 +42,7 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 
     private DotNode addDotToCycleAsHead(Dot dot){
         this.dotNode = new DotNode(dot, this.dotNode);
-        dotsSet.add(dot);
+        addToDotsSet(this.dotNode);
         return this.dotNode;
     }
 
@@ -61,7 +61,7 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         for (int i = 1 ; i< pathIndex ; i++){          // add new dots to cycle // path[0] is a fromDot
             Dot d = path[i];
             dn = dn.next = new DotNode(d,null);
-            dotsSet.add(d);
+            addToDotsSet(dn);
         }
         dn.next = toDotDn;
 
@@ -75,11 +75,11 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         int xmax = 0;
         int ymin = Integer.MAX_VALUE;
         int ymax = 0;
-        this.dotsSet = new HashSet<>();
+        this.dotsSet = new HashMap<>();
         DotNode dn = this.dotNode;
         while (dn!=null ){
             Dot d = dn.d;
-            dotsSet.add(d);
+            addToDotsSet(dn);
             if(d.getX() > xmax)
                 xmax = d.getX();
             if(d.getX() < xmin)
@@ -101,17 +101,10 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return dn.next!=null ? dn.next : this.getDotNode();
     }
 
-    public DotNode getDotNodeWithDot(Dot d){
-        DotNode dn = this.dotNode;
-        while (dn!=null && !dn.d.equals(d))
-            dn = dn.next;
-        return dn;
-    }
-
     public boolean doesOverlapWithCycleOrDoesContainIt(Cycle c) {
         int commonDotsCount = 0;
-        for (Dot d : c.dotsSet) {
-            if (this.contains(d))
+        for (DotNode dn : c.dotsSet.values()) {
+            if (this.contains(dn.d))
                 if (++commonDotsCount > 1)
                     return true;
         }
@@ -120,24 +113,24 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 
     public boolean doesOverlapWithCycle(Cycle c){
         int commonDotsCount = 0;
-        for (Dot d : c.dotsSet) {
-            if (this.contains(d))
+        for (DotNode dn : c.dotsSet.values()) {
+            if (this.contains(dn.d))
                 if (++commonDotsCount > 1)
                     return true;
         }
         return false;
     }
 
-    public boolean doesContainACycle(Cycle c){
-        for(Dot d : c.getDotsSet()){
-            if (this.hasOutside(d))
+    public boolean doesContainACycle(Cycle c){ // chyba wystarczy sprawdzic czy pierwsza kropka nie nie bedaca czescia cyklu jest w jego wnetrzu
+        for(DotNode dn : c.getDotsSet()){
+            if (this.hasOutside(dn.d))
                 return false;
         }
         return true;
     }
 
     public boolean contains(Dot d){
-        return dotsSet.contains(d);
+        return dotsSet.containsKey(d.hashCode());
     }
 
     // Dot d is inside a circle if on d.getX() coordinate cycle contains
@@ -199,21 +192,18 @@ public class Cycle implements ICycle, Cloneable, Serializable {
     }
 
     public boolean hasOutside(Dot d) {
-        return !dotsSet.contains(d) && !hasInside(d);
+        return !dotsSet.containsKey(d.hashCode()) && !hasInside(d);
     }
 
-    public void cutBase(DotNode firstDnc, Base base){
-        DotNode dnc = this.getDotNode();
-        while (dnc!=null){
-            dnc = dnc.next;
-        }
-        DotNode dnbb = base.getDotNode();
-        while (dnbb!=null){
-            dnbb = dnbb.next;
+    public void cutOrAddBase(Base base){
+        // changing head to prevent infinite cycles
+        changeHeadToNodeNotOnBorder(base.getCycle());
+        DotNode firstDnc = getDotNode();
+        while (!base.contains(firstDnc.d)){
+            firstDnc = firstDnc.next;
         }
 
-
-        DotNode firstDnb = base.getCycle().findDnWithDot(firstDnc.d);
+        DotNode firstDnb = base.getCycle().getDotNodeWithDot(firstDnc.d);
 
         DotNode lastDncOnBase = firstDnc;
         DotNode dn = firstDnc;
@@ -223,8 +213,9 @@ public class Cycle implements ICycle, Cloneable, Serializable {
             dn = dn.next;
         }
 
+
         DotNode firstDnbNext = base.getNext(firstDnb);
-        DotNode firstDncNext =  firstDnc.next ;     // firstDnc.next has to exist checked - invocation check required
+        DotNode firstDncNext = getNext(firstDnc);     // firstDnc.next has to exist checked - invocation check required
 
         deleteOldPath(firstDnc,lastDncOnBase);
 
@@ -240,13 +231,30 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 
             addNewPathReverse(lastDncOnBase, lastDnbOnCycle, firstDnc, base);
         }
+
+        breakInfiniteCycleIfItExists();
+    }
+
+    private void breakInfiniteCycleIfItExists(){
+        Set<Dot> visitedDots = new HashSet<>();
+        DotNode head = getDotNode();
+        visitedDots.add(head.d);
+        DotNode dn = head.next;
+        while (dn.next != null ){
+            visitedDots.add(dn.d);
+            if(visitedDots.contains(dn.next.d)) {
+                dn.next = null;
+                break;
+            }
+            dn = dn.next;
+        }
     }
 
     private void deleteOldPath(DotNode fDnc, DotNode lDnc){
         DotNode dn = fDnc;
-        while (dn.next != lDnc){
-            dn = dn.next;
-            dotsSet.remove(dn.d);
+        while (getNext(dn) != lDnc){
+            dn = getNext(dn);
+            dotsSet.remove(dn.hashCode());
         }
     }
 
@@ -262,13 +270,15 @@ public class Cycle implements ICycle, Cloneable, Serializable {
 
     private void addNewPath(DotNode fDnc, DotNode fDnbNext, DotNode lDnc, Base base){
         DotNode dnc = fDnc;
+        boolean is_fDncNextNull = fDnc.next==null;
         DotNode dnb = fDnbNext;
         while ( ! dnb.equals(lDnc)){
             dnc = dnc.next = new DotNode(dnb.d,null);
-            dotsSet.add(dnb.d);
+            addToDotsSet(dnc);
             dnb = base.getNext(dnb);
         }
-        dnc.next = lDnc;
+        //if(is_fDncNextNull)   // chyba nie zawsze dobrze to dziala dowiedz sie czemu
+            dnc.next = lDnc;
     }
 
     private void addNewPathReverse(DotNode lDnc, DotNode lDnb, DotNode fDnc, Base base){
@@ -277,10 +287,11 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         while ( !dnb.equals(fDnc)){
             Dot d = dnb.d;
             dnc = new DotNode(d,dnc);
-            dotsSet.add(d);
+            addToDotsSet(dnc);
             dnb = base.getNext(dnb);
         }
-        fDnc.next = dnc;
+        //if(fDnc.next != null)
+            fDnc.next = dnc;
     }
 
     public void printCycle(){
@@ -293,14 +304,8 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         }while (dn!= null);
     }
 
-    public DotNode findDnWithDot(Dot d){
-        DotNode dn = this.dotNode;
-        while (dn!=null){
-            if(dn.d.equals(d))
-                return dn;
-            dn = dn.next;
-        }
-        return null;
+    public DotNode getDotNodeWithDot(Dot d){
+        return this.dotsSet.get(d.hashCode());
     }
 
     public int getXmin() {
@@ -323,7 +328,47 @@ public class Cycle implements ICycle, Cloneable, Serializable {
         return dotNode;
     }
 
-    public HashSet<Dot> getDotsSet() {
-        return dotsSet;
+    public void changeHeadToNodeNotOnBorder(Cycle neighboringCycle){
+        if(neighboringCycle.contains(getDotNode().d)) {
+            DotNode head = getDotNode();
+            DotNode prevNewHead = head;
+            if(head == null || prevNewHead.next == null || null == prevNewHead.d)
+                System.out.println("wow");
+            try {
+                while (neighboringCycle.contains(prevNewHead.next.d))
+                    prevNewHead = getNext(prevNewHead);
+            }
+            catch (Exception e){
+                System.out.println("wow2");
+            }
+            DotNode dn = prevNewHead;
+            while(dn.next != null && dn.next != head)
+                dn = dn.next;
+            dn.next = head;
+            this.dotNode = prevNewHead.next;
+            prevNewHead.next = null;
+        }
+    }
+    
+    public Collection<DotNode> getDotsSet() {
+        return dotsSet.values();
+    }
+
+    @Override
+    protected Object clone()  {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException cloneNotSupportedException){
+            cloneNotSupportedException.printStackTrace();
+            return null;
+        }
+    }
+    
+    private DotNode addToDotsSet(DotNode dn){
+        return this.dotsSet.put(dn.hashCode(),dn);
+    }
+    
+    private DotNode removeFromDotsSet(DotNode dn){
+        return this.dotsSet.remove(dn.hashCode());
     }
 }
